@@ -188,7 +188,7 @@ namespace Sundstrom.Tasks
             }
         }
 
-        public Task AwaitIsEmpty(int frequency = 200)
+        public Task<TaskQueue> AwaitIsEmpty(int frequency = 200)
         {
             return Task.Run(async () =>
             {
@@ -196,6 +196,8 @@ namespace Sundstrom.Tasks
                 {
                     await Task.Delay(frequency);
                 }
+
+                return this;
             });
         }
 
@@ -239,7 +241,7 @@ namespace Sundstrom.Tasks
             }
         }
 
-        public static bool Delete(TaskQueue queue)
+        public static bool Remove(TaskQueue queue)
         {
             return _queues.Remove(queue.Tag);
         }
