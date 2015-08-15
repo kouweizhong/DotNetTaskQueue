@@ -142,13 +142,13 @@ namespace Sundstrom.Tasks
             }
         }
 
-        public Task AwaitIsEmpty()
+        public Task AwaitIsEmpty(int check = 200)
         {
             return Task.Run(async () =>
             {
                 while (!IsEmpty)
                 {
-                    await Task.Delay(500);
+                    await Task.Delay(check);
                 }
             });
         }
