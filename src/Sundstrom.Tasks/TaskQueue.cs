@@ -34,6 +34,25 @@ namespace Sundstrom.Tasks
         }
     }
 
+    public class TaskQueueExceptionEventArgs : EventArgs
+    {
+        internal TaskQueueExceptionEventArgs(TaskQueue taskQueue, Exception exception)
+        {
+            TaskQueue = taskQueue;
+            Exception = exception;
+        }
+
+        public TaskQueue TaskQueue
+        {
+            get;
+        }
+
+        public Exception Exception
+        {
+            get;
+        }
+    }
+
     public class TaskQueue
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
@@ -89,6 +108,12 @@ namespace Sundstrom.Tasks
             queue.Clear();
         }
 
+        public bool CancelOnException { get; set; } = false;
+
+        public bool ThrowOnException { get; set; } = false;
+
+        public event EventHandler<TaskQueueExceptionEventArgs> Exception;
+
         private async Task Next(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -98,6 +123,8 @@ namespace Sundstrom.Tasks
             {
                 if (queue.Count > 0)
                 {
+                    // Peek the current task.
+
                     var context = queue.Peek();
 
                     try
@@ -105,25 +132,54 @@ namespace Sundstrom.Tasks
                         _isRunning = true;
                         _isBusy = true;
 
+                        // Execute the current task.
+
                         await context.Action(context.Queue, cts.Token);
                         Debug.WriteLine("Task finished");
                     }
-                    catch (Exception e)
+                    catch (Exception exc)
                     {
-                        throw;
+                        // Handling any exception thrown inside a task.
+
+                        if (ThrowOnException)
+                        {
+                            // Cancel the queue and throw an exception.
+
+                            ClearInternal();
+                            throw exc;
+                        }
+                        else
+                        {
+                            // Invoke the Exception event handlers.
+
+                            Exception?.Invoke(this, new TaskQueueExceptionEventArgs(this, exc));
+      
+                            if (CancelOnException)
+                            {
+                                // Cancel the queue.
+
+                                ClearInternal();
+                            }
+                        }
                     }
-                    finally
-                    {
-                        queue.Dequeue();
-                        _isBusy = false;
-                        await Next(cts.Token);
-                    }
+
+                    // Dequeue the currently finished task and request the next.
+
+                    queue.Dequeue();
+                    _isBusy = false;
+                    await Next(cts.Token);
                 }
             }
             else
             {
                 _isRunning = false;
             }
+        }
+
+        private void ClearInternal()
+        {
+            _isBusy = false;
+            Clear();
         }
 
         public bool IsRunning
