@@ -73,40 +73,6 @@ namespace Sundstrom.Tasks.Tests
         }
 
         [Fact]
-        public async Task Exception()
-        {
-            // This does not work.
-
-            Console.WriteLine("EXCEPTION");
-
-            TaskQueue.Default.ThrowOnException = true;
-
-            try
-            {
-                await TaskQueue.Default.Schedule(async (queue, ct) =>
-                {
-                    Console.WriteLine("Item 1: Async");
-
-                    await Task.Delay(2000);
-
-                }).Schedule((queue, ct) =>
-                {
-                    Console.WriteLine("Item 2: Sync");
-                    throw new Exception();
-                }).Schedule(async (queue, ct) =>
-                {
-                    Console.WriteLine("Item 3: Async");
-
-                    await Task.Delay(2000);
-                }).AwaitIsEmpty();
-            }
-            catch (Exception exc)
-            {
-                Debug.WriteLine(exc);
-            }
-        }
-
-        [Fact]
         public async Task Exception_EventHandler()
         {
             Console.WriteLine("EXCEPTION");

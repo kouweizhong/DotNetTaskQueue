@@ -140,32 +140,24 @@ namespace Sundstrom.Tasks
                     catch (Exception exc)
                     {
                         // Handling any exception thrown inside a task.
+                        // Invoke the Exception event handlers.
 
-                        if (ThrowOnException)
+                        Exception?.Invoke(this, new TaskQueueExceptionEventArgs(this, exc));
+
+                        if (CancelOnException)
                         {
-                            // Cancel the queue and throw an exception.
+                            // Cancel the queue.
 
                             ClearInternal();
-                            throw exc;
-                        }
-                        else
-                        {
-                            // Invoke the Exception event handlers.
-
-                            Exception?.Invoke(this, new TaskQueueExceptionEventArgs(this, exc));
-      
-                            if (CancelOnException)
-                            {
-                                // Cancel the queue.
-
-                                ClearInternal();
-                            }
                         }
                     }
 
                     // Dequeue the currently finished task and request the next.
 
-                    queue.Dequeue();
+                    if (queue.Count > 0)
+                    {
+                        queue.Dequeue();
+                    }
                     _isBusy = false;
                     await Next(cts.Token);
                 }
