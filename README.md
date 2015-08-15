@@ -1,17 +1,57 @@
 # DotNetTaskQueue
 Simple task queue for .NET (DNX)
 
-# Prerequisites
+## Description
+
+TaskQueue for x-plat .NET that supports queueing and chaining of sequential tasks - both synchronous and asynchronous code.
+
+```csharp
+await TaskQueue.Default.Schedule(async (queue, ct) =>
+{
+    Console.WriteLine("Item 1: Async");
+
+    await Task.Delay(2000);
+
+}).Schedule((queue, ct) =>
+{
+    Console.WriteLine("Item 2: Sync");
+}).Schedule(async (queue, ct) =>
+{
+    Console.WriteLine("Item 3: Async");
+
+    await Task.Delay(2000);
+}).AwaitIsEmpty();
+```
+
+See tests for more examples.
+
+## Prerequisites
 
 * DNX (.NET Execution Environment) - currently in Beta
 
-# Test
+Get the latest version of DNX here: https://github.com/aspnet/home
 
-To run the tests (assuming you are starting in the src-directory):
+## Build
 
-    cd Sundstrom.Tasks.Tests
-    dnx . test
+To build this solution:
 
-In the next-coming versions (Beta 7 +) you should be able to just:
+```shell
+cd src
+dnu restore
+dnu build
+```
 
-    dnx test
+## Test
+
+To run the tests:
+    
+```shell
+cd Sundstrom.Tasks.Tests
+dnx . test
+```
+
+In the next-coming versions (Beta 7 +) you should be able to just run:
+
+```shell
+dnx test
+```

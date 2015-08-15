@@ -30,7 +30,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("ASYNCHRONOUS");
 
-            TaskQueue.Default.Schedule(async (queue, ct) =>
+            await TaskQueue.Default.Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 1");
 
@@ -46,9 +46,7 @@ namespace Sundstrom.Tasks.Tests
                 Console.WriteLine("Item 3");
 
                 await Task.Delay(2000);
-            });
-
-            await TaskQueue.Default.AwaitIsEmpty();
+            }).AwaitIsEmpty();
         }
 
         [Fact]
@@ -56,7 +54,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("COMBO");
 
-            TaskQueue.Default.Schedule(async (queue, ct) =>
+            await TaskQueue.Default.Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
@@ -70,9 +68,7 @@ namespace Sundstrom.Tasks.Tests
                 Console.WriteLine("Item 3: Async");
 
                 await Task.Delay(2000);
-            });
-
-            await TaskQueue.Default.AwaitIsEmpty();
+            }).AwaitIsEmpty();
         }
     }
 }
