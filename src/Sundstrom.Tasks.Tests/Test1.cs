@@ -14,6 +14,8 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("SYNCHRONOUS");
 
+            int taskExecutedCount = 0;
+
             TaskQueue.Default.Schedule((queue, ct) =>
             {
                 Console.WriteLine("Item 1");
@@ -31,23 +33,32 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("ASYNCHRONOUS");
 
+            int taskExecutedCount = 0;
+
             await TaskQueue.Default.Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 1");
 
                 await Task.Delay(2000);
 
+                taskExecutedCount++;
             }).Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 2");
 
                 await Task.Delay(2000);
+
+                taskExecutedCount++;
             }).Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 3");
 
                 await Task.Delay(2000);
+
+                taskExecutedCount++;
             }).AwaitIsEmpty();
+
+            Assert.Equal(taskExecutedCount, 3);
         }
 
         [Fact]
@@ -55,21 +66,30 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("COMBO");
 
+            int taskExecutedCount = 0;
+
             await TaskQueue.Default.Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
                 await Task.Delay(2000);
 
+                taskExecutedCount++;
             }).Schedule((queue, ct) =>
             {
                 Console.WriteLine("Item 2: Sync");
+
+                taskExecutedCount++;
             }).Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 3: Async");
 
                 await Task.Delay(2000);
+
+                taskExecutedCount++;
             }).AwaitIsEmpty();
+
+            Assert.Equal(taskExecutedCount, 3);
         }
 
         [Fact]
@@ -77,11 +97,13 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("EXCEPTION");
 
+            int taskExecutedCount = 0;
+
             TaskQueue.Default.CancelOnException = true;
 
             TaskQueue.Default.Exception += (sender, args) =>
             {
-                Debug.WriteLine(args.Exception);
+                Console.WriteLine(args.Exception);
             };
 
             await TaskQueue.Default.Schedule(async (queue, ct) =>
@@ -90,16 +112,23 @@ namespace Sundstrom.Tasks.Tests
 
                 await Task.Delay(2000);
 
+                taskExecutedCount++;
             }).Schedule((queue, ct) =>
             {
                 Console.WriteLine("Item 2: Sync");
                 throw new Exception();
+
+                taskExecutedCount++;
             }).Schedule(async (queue, ct) =>
             {
                 Console.WriteLine("Item 3: Async");
 
                 await Task.Delay(2000);
+
+                taskExecutedCount++;
             }).AwaitIsEmpty();
+
+            Assert.Equal(taskExecutedCount, 1);
         }
     }
 }
