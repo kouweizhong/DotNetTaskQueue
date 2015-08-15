@@ -26,6 +26,7 @@ await TaskQueue.Default.Schedule(async (queue, ct) =>
 Handle exceptions:
 
 ```csharp
+// Cancels the rest of the tasks in queue on exception (optional)
 TaskQueue.Default.CancelOnException = true;
 
 TaskQueue.Default.Exception += (sender, args) =>
