@@ -110,8 +110,6 @@ namespace Sundstrom.Tasks
 
         public bool CancelOnException { get; set; } = false;
 
-        public bool ThrowOnException { get; set; } = false;
-
         public event EventHandler<TaskQueueExceptionEventArgs> Exception;
 
         private async Task Next(CancellationToken cancellationToken)
