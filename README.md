@@ -23,6 +23,22 @@ await TaskQueue.Default.Schedule(async (queue, ct) =>
 }).AwaitIsEmpty();
 ```
 
+Handle exceptions:
+
+```csharp
+TaskQueue.Default.CancelOnException = true;
+
+TaskQueue.Default.Exception += (sender, args) =>
+{
+    Console.WriteLine(args.Exception);
+};
+```
+
+Also supports:
+
+* Creation of additional queues (with tagging).
+* Task cancellation.
+
 See tests for more examples.
 
 ## Prerequisites
