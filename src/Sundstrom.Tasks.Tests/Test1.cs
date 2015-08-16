@@ -16,17 +16,17 @@ namespace Sundstrom.Tasks.Tests
 
             int taskExecutedCount = 0;
 
-            await TaskQueue.Default.Schedule((queue, ct) =>
+            await TaskQueue.Default.Schedule((context, ct) =>
             {
                 Console.WriteLine("Item 1");
 
                 taskExecutedCount++;
-            }).Schedule((queue, ct) =>
+            }).Schedule((context, ct) =>
             {
                 Console.WriteLine("Item 2");
 
                 taskExecutedCount++;
-            }).Schedule((queue, ct) =>
+            }).Schedule((context, ct) =>
             {
                 Console.WriteLine("Item 3");
 
@@ -43,21 +43,21 @@ namespace Sundstrom.Tasks.Tests
 
             int taskExecutedCount = 0;
 
-            await TaskQueue.Default.Schedule(async (queue, ct) =>
+            await TaskQueue.Default.Schedule(async (context, ct) =>
             {
                 Console.WriteLine("Item 1");
 
                 await Task.Delay(2000);
 
                 taskExecutedCount++;
-            }).Schedule(async (queue, ct) =>
+            }).Schedule(async (context, ct) =>
             {
                 Console.WriteLine("Item 2");
 
                 await Task.Delay(2000);
 
                 taskExecutedCount++;
-            }).Schedule(async (queue, ct) =>
+            }).Schedule(async (context, ct) =>
             {
                 Console.WriteLine("Item 3");
 
@@ -76,19 +76,19 @@ namespace Sundstrom.Tasks.Tests
 
             int taskExecutedCount = 0;
 
-            await TaskQueue.Default.Schedule(async (queue, ct) =>
+            await TaskQueue.Default.Schedule(async (context, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
                 await Task.Delay(2000);
 
                 taskExecutedCount++;
-            }).Schedule((queue, ct) =>
+            }).Schedule((context, ct) =>
             {
                 Console.WriteLine("Item 2: Sync");
 
                 taskExecutedCount++;
-            }).Schedule(async (queue, ct) =>
+            }).Schedule(async (context, ct) =>
             {
                 Console.WriteLine("Item 3: Async");
 
@@ -116,20 +116,20 @@ namespace Sundstrom.Tasks.Tests
                 Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
             };
 
-            await TaskQueue.Default.Schedule("Task 1", async (queue, ct) =>
+            await TaskQueue.Default.Schedule("Task 1", async (context, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
                 await Task.Delay(2000);
 
                 taskExecutedCount++;
-            }).Schedule("Task 2", (queue, ct) =>
+            }).Schedule("Task 2", (context, ct) =>
             {
                 Console.WriteLine("Item 2: Sync");
                 throw new Exception();
 
                 taskExecutedCount++;
-            }).Schedule("Task 3", async (queue, ct) =>
+            }).Schedule("Task 3", async (context, ct) =>
             {
                 Console.WriteLine("Item 3: Async");
 

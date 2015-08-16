@@ -98,7 +98,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public TaskQueue Schedule(Func<TaskQueue, CancellationToken, Task> action)
+        public TaskQueue Schedule(Func<TaskContext, CancellationToken, Task> action)
         {
             queue.Enqueue(new TaskContext(this, action));
             Next(cts.Token);
@@ -111,7 +111,7 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public TaskQueue Schedule(string tag, Func<TaskQueue, CancellationToken, Task> action)
+        public TaskQueue Schedule(string tag, Func<TaskContext, CancellationToken, Task> action)
         {
             queue.Enqueue(new TaskContext(this, action, tag));
             Next(cts.Token);
@@ -123,7 +123,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public TaskQueue Schedule(Action<TaskQueue, CancellationToken> action)
+        public TaskQueue Schedule(Action<TaskContext, CancellationToken> action)
         {
             queue.Enqueue(new TaskContext(this, async (q, ct) => action(q, ct)));
             Next(cts.Token);
@@ -136,7 +136,7 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public TaskQueue Schedule(string tag, Action<TaskQueue, CancellationToken> action)
+        public TaskQueue Schedule(string tag, Action<TaskContext, CancellationToken> action)
         {
             queue.Enqueue(new TaskContext(this, async (q, ct) => action(q, ct), tag));
             Next(cts.Token);
@@ -225,7 +225,7 @@ namespace Sundstrom.Tasks
 
                         // Execute the current task.
 
-                        await context.Action(context.Queue, cts.Token);
+                        await context.Action(context, cts.Token);
                         Debug.WriteLine("Task finished");
                     }
                     catch (Exception exc)
@@ -373,39 +373,34 @@ namespace Sundstrom.Tasks
         }
     }
 
-    internal class TaskContext
+    /// <summary>
+    /// Holds the context of a task.
+    /// </summary>
+    public class TaskContext
     {
-        internal Func<TaskQueue, CancellationToken, Task> Action;
+        internal Func<TaskContext, CancellationToken, Task> Action;
 
-        public TaskContext(TaskQueue queue, Func<TaskQueue, CancellationToken, Task> action)
+        public TaskContext(TaskQueue queue, Func<TaskContext, CancellationToken, Task> action)
         {
             this.Queue = queue;
             this.Action = action;
         }
 
-        public TaskContext(TaskQueue queue, Func<TaskQueue, CancellationToken, Task> action, string taskTag)
+        public TaskContext(TaskQueue queue, Func<TaskContext, CancellationToken, Task> action, string taskTag)
         {
             this.Queue = queue;
             this.Action = action;
             this.Tag = taskTag;
         }
 
-        public TaskQueue Queue { get; private set; }
+        /// <summary>
+        /// Gets the queue.
+        /// </summary>
+        public TaskQueue Queue { get; }
 
-        public string Tag { get; private set; }
-
-        public event EventHandler Queued;
-
-        public event EventHandler Executing;
-
-        internal void RaiseQueued()
-        {
-            Queued?.Invoke(this, new EventArgs());
-        }
-
-        internal void RaiseExecuting()
-        {
-            Executing?.Invoke(this, new EventArgs());
-        }
+        /// <summary>
+        /// Gets the tag. (if any)
+        /// </summary>
+        public string Tag { get; }
     }
 }
