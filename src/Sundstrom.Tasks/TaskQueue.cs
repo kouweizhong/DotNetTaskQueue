@@ -257,8 +257,6 @@ namespace Sundstrom.Tasks
                         TaskExecuting?.Invoke(this, new TaskEventArgs(this, context.Tag));
 
                         await context.Action(context, cts.Token);
-
-                        TaskExecuted?.Invoke(this, new TaskEventArgs(this, context.Tag));
                     }
                     catch (Exception exc)
                     {
@@ -274,6 +272,8 @@ namespace Sundstrom.Tasks
                             ClearInternal();
                         }
                     }
+
+                    TaskExecuted?.Invoke(this, new TaskEventArgs(this, context.Tag));
 
                     // Dequeue the currently finished task and request the next.
 
