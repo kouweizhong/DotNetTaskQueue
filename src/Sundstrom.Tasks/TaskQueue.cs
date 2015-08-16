@@ -217,6 +217,16 @@ namespace Sundstrom.Tasks
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskEnqueued;
 
+        /// <summary>
+        /// Raises when a task is about to be executed.
+        /// </summary>
+        public event EventHandler<TaskEventArgs> TaskExecuting;
+
+        /// <summary>
+        /// Raises when a task is has been executed.
+        /// </summary>
+        public event EventHandler<TaskEventArgs> TaskExecuted;
+
         private async Task Next(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -244,8 +254,11 @@ namespace Sundstrom.Tasks
 
                         // Execute the current task.
 
+                        TaskExecuting?.Invoke(this, new TaskEventArgs(this, context.Tag));
+
                         await context.Action(context, cts.Token);
-                        Debug.WriteLine("Task finished");
+
+                        TaskExecuted?.Invoke(this, new TaskEventArgs(this, context.Tag));
                     }
                     catch (Exception exc)
                     {
