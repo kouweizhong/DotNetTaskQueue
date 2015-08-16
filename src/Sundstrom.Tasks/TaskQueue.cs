@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace Sundstrom.Tasks
 {
-    public class TaskQueueExceptionEventArgs : EventArgs
+    public class TaskEventArgs : EventArgs
     {
-        internal TaskQueueExceptionEventArgs(TaskQueue taskQueue, Exception exception, string tag)
+        internal TaskEventArgs(TaskQueue taskQueue, string tag)
+        {
+            TaskQueue = taskQueue;
+            Tag = tag;
+        }
+
+        internal TaskEventArgs(TaskQueue taskQueue, string tag, Exception exception)
         {
             TaskQueue = taskQueue;
             Exception = exception;
@@ -93,6 +99,13 @@ namespace Sundstrom.Tasks
         /// </summary>
         public object Data { get; private set; }
 
+        private void ScheduleInternal(TaskContext context)
+        {
+            queue.Enqueue(context);
+            TaskEnqueued?.Invoke(this, new TaskEventArgs(this, context.Tag));
+            Next(cts.Token);
+        }
+
         /// <summary>
         /// Schedules a task based on a given function.
         /// </summary>
@@ -100,10 +113,11 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public TaskQueue Schedule(Func<TaskContext, CancellationToken, Task> action)
         {
-            queue.Enqueue(new TaskContext(this, action));
-            Next(cts.Token);
+            var context = new TaskContext(this, action);
+            ScheduleInternal(context);
             return this;
         }
+
 
         /// <summary>
         /// Schedules a task based on a given function.
@@ -113,8 +127,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public TaskQueue Schedule(string tag, Func<TaskContext, CancellationToken, Task> action)
         {
-            queue.Enqueue(new TaskContext(this, action, tag));
-            Next(cts.Token);
+            var context = new TaskContext(this, action, tag);
+            ScheduleInternal(context);
             return this;
         }
 
@@ -125,8 +139,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public TaskQueue Schedule(Action<TaskContext, CancellationToken> action)
         {
-            queue.Enqueue(new TaskContext(this, async (q, ct) => action(q, ct)));
-            Next(cts.Token);
+            var context = new TaskContext(this, async (q, ct) => action(q, ct));
+            ScheduleInternal(context);
             return this;
         }
 
@@ -138,8 +152,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public TaskQueue Schedule(string tag, Action<TaskContext, CancellationToken> action)
         {
-            queue.Enqueue(new TaskContext(this, async (q, ct) => action(q, ct), tag));
-            Next(cts.Token);
+            var context = new TaskContext(this, async (q, ct) => action(q, ct), tag);
+            ScheduleInternal(context);
             return this;
         }
 
@@ -150,8 +164,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public TaskQueue Schedule(Task task)
         {
-            queue.Enqueue(new TaskContext(this, async (q, ct) => await task));
-            Next(cts.Token);
+            var context = new TaskContext(this, async (q, ct) => await task);
+            ScheduleInternal(context);
             return this;
         }
 
@@ -164,8 +178,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public TaskQueue Schedule(string tag, Task task)
         {
-            queue.Enqueue(new TaskContext(this, async (q, ct) => await task));
-            Next(cts.Token);
+            var context = new TaskContext(this, async (q, ct) => await task);
+            ScheduleInternal(context);
             return this;
         }
 
@@ -196,7 +210,12 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Raises when an exception is thrown in a scheduled task.
         /// </summary>
-        public event EventHandler<TaskQueueExceptionEventArgs> Exception;
+        public event EventHandler<TaskEventArgs> Exception;
+
+        /// <summary>
+        /// Raises when a task is enqueued.
+        /// </summary>
+        public event EventHandler<TaskEventArgs> TaskEnqueued;
 
         private async Task Next(CancellationToken cancellationToken)
         {
@@ -233,7 +252,7 @@ namespace Sundstrom.Tasks
                         // Handling any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        Exception?.Invoke(this, new TaskQueueExceptionEventArgs(this, exc, context.Tag));
+                        Exception?.Invoke(this, new TaskEventArgs(this, context.Tag, exc));
 
                         if (CancelOnException)
                         {
