@@ -10,22 +10,30 @@ namespace Sundstrom.Tasks.Tests
     public class Test1
     {
         [Fact]
-        public void Synchronous()
+        public async Task Synchronous()
         {
             Console.WriteLine("SYNCHRONOUS");
 
             int taskExecutedCount = 0;
 
-            TaskQueue.Default.Schedule((queue, ct) =>
+            await TaskQueue.Default.Schedule((queue, ct) =>
             {
                 Console.WriteLine("Item 1");
+
+                taskExecutedCount++;
             }).Schedule((queue, ct) =>
             {
                 Console.WriteLine("Item 2");
+
+                taskExecutedCount++;
             }).Schedule((queue, ct) =>
             {
                 Console.WriteLine("Item 3");
-            });
+
+                taskExecutedCount++;
+            }).AwaitIsEmpty();
+
+            Assert.Equal(taskExecutedCount, 3);
         }
 
         [Fact]

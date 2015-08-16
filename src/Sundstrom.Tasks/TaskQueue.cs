@@ -7,52 +7,43 @@ using System.Threading.Tasks;
 
 namespace Sundstrom.Tasks
 {
-    public class TaskContext
-    {
-        internal Func<TaskQueue, CancellationToken, Task> Action;
-
-        public TaskContext(TaskQueue queue, Func<TaskQueue, CancellationToken, Task> action)
-        {
-            this.Queue = queue;
-            this.Action = action;
-        }
-
-        public TaskQueue Queue { get; private set; }
-
-        public event EventHandler Queued;
-
-        public event EventHandler Executing;
-
-        internal void RaiseQueued()
-        {
-            Queued?.Invoke(this, new EventArgs());
-        }
-
-        internal void RaiseExecuting()
-        {
-            Executing?.Invoke(this, new EventArgs());
-        }
-    }
-
     public class TaskQueueExceptionEventArgs : EventArgs
     {
-        internal TaskQueueExceptionEventArgs(TaskQueue taskQueue, Exception exception)
+        internal TaskQueueExceptionEventArgs(TaskQueue taskQueue, Exception exception, string tag)
         {
             TaskQueue = taskQueue;
             Exception = exception;
+            Tag = tag;
         }
 
+        /// <summary>
+        /// Gets the tag associated with this task. (if any)
+        /// </summary>
+        public string Tag
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the queue in this context.
+        /// </summary>
         public TaskQueue TaskQueue
         {
             get;
         }
 
+        /// <summary>
+        /// Gets the thrown exception.
+        /// </summary>
         public Exception Exception
         {
             get;
         }
     }
 
+    /// <summary>
+    /// Simple task queue
+    /// </summary>
     public class TaskQueue
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
@@ -64,16 +55,49 @@ namespace Sundstrom.Tasks
 
         private static TaskQueue _default;
 
+        /// <summary>
+        /// Initializes a queue.
+        /// </summary>
+        public TaskQueue()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a queue with a tag.
+        /// </summary>
+        /// <param name="tag"></param>
+        public TaskQueue(string tag)
+        {
+            Tag = tag;
+        }
+
+        /// <summary>
+        /// Initializes a queue with a tag and some data.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="data"></param>
         public TaskQueue(string tag, object data)
         {
             Tag = tag;
             Data = data;
         }
 
+        /// <summary>
+        /// Gets or sets an identifier that is associated with the queue.
+        /// </summary>
         public string Tag { get; private set; }
 
+        /// <summary>
+        /// Gets or sets some data that is associated with the queue.
+        /// </summary>
         public object Data { get; private set; }
 
+        /// <summary>
+        /// Schedules a task based on a given function.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public TaskQueue Schedule(Func<TaskQueue, CancellationToken, Task> action)
         {
             queue.Enqueue(new TaskContext(this, action));
@@ -81,6 +105,24 @@ namespace Sundstrom.Tasks
             return this;
         }
 
+        /// <summary>
+        /// Schedules a task based on a given function.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public TaskQueue Schedule(string tag, Func<TaskQueue, CancellationToken, Task> action)
+        {
+            queue.Enqueue(new TaskContext(this, action, tag));
+            Next(cts.Token);
+            return this;
+        }
+
+        /// <summary>
+        /// Schedules a task based on a given action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public TaskQueue Schedule(Action<TaskQueue, CancellationToken> action)
         {
             queue.Enqueue(new TaskContext(this, async (q, ct) => action(q, ct)));
@@ -88,6 +130,24 @@ namespace Sundstrom.Tasks
             return this;
         }
 
+        /// <summary>
+        /// Schedules a task with the specified key based on a given action.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public TaskQueue Schedule(string tag, Action<TaskQueue, CancellationToken> action)
+        {
+            queue.Enqueue(new TaskContext(this, async (q, ct) => action(q, ct), tag));
+            Next(cts.Token);
+            return this;
+        }
+
+        /// <summary>
+        /// Schedules a task.
+        /// </summary>
+        /// <param name="task"></param>
+        /// <returns></returns>
         public TaskQueue Schedule(Task task)
         {
             queue.Enqueue(new TaskContext(this, async (q, ct) => await task));
@@ -95,6 +155,23 @@ namespace Sundstrom.Tasks
             return this;
         }
 
+
+        /// <summary>
+        /// Schedules a task.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        public TaskQueue Schedule(string tag, Task task)
+        {
+            queue.Enqueue(new TaskContext(this, async (q, ct) => await task));
+            Next(cts.Token);
+            return this;
+        }
+
+        /// <summary>
+        /// Cancels the queue.
+        /// </summary>
         public void Cancel()
         {
             cts.Cancel();
@@ -102,14 +179,23 @@ namespace Sundstrom.Tasks
             _isBusy = false;
         }
 
+        /// <summary>
+        /// Clear the queue.
+        /// </summary>
         public void Clear()
         {
             if (_isBusy) throw new InvalidOperationException();
             queue.Clear();
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicated whether the queue should cancel on exception or not.
+        /// </summary>
         public bool CancelOnException { get; set; } = false;
 
+        /// <summary>
+        /// Raises when an exception is thrown in a scheduled task.
+        /// </summary>
         public event EventHandler<TaskQueueExceptionEventArgs> Exception;
 
         private async Task Next(CancellationToken cancellationToken)
@@ -121,6 +207,13 @@ namespace Sundstrom.Tasks
             {
                 if (queue.Count > 0)
                 {
+                    // Optional delay.
+
+                    if (Delay > default(TimeSpan))
+                    {
+                        await Task.Delay(Delay);
+                    }
+
                     // Peek the current task.
 
                     var context = queue.Peek();
@@ -140,7 +233,7 @@ namespace Sundstrom.Tasks
                         // Handling any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        Exception?.Invoke(this, new TaskQueueExceptionEventArgs(this, exc));
+                        Exception?.Invoke(this, new TaskQueueExceptionEventArgs(this, exc, context.Tag));
 
                         if (CancelOnException)
                         {
@@ -172,6 +265,9 @@ namespace Sundstrom.Tasks
             Clear();
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether this queue is running or not.
+        /// </summary>
         public bool IsRunning
         {
             get
@@ -180,6 +276,9 @@ namespace Sundstrom.Tasks
             }
         }
 
+        /// <summary>
+        /// Gets a value that indicates whether this queue is empty of not.
+        /// </summary>
         public bool IsEmpty
         {
             get
@@ -188,19 +287,32 @@ namespace Sundstrom.Tasks
             }
         }
 
-        public Task<TaskQueue> AwaitIsEmpty(int frequency = 200)
+        /// <summary>
+        /// Gets or sets the the delay between each task.
+        /// </summary>
+        public TimeSpan Delay { get; set; }
+
+        /// <summary>
+        /// Waits for the queue to be empty.
+        /// </summary>
+        /// <param name="checkRate"></param>
+        /// <returns>The current queue.</returns>
+        public Task<TaskQueue> AwaitIsEmpty(int checkRate = 200)
         {
             return Task.Run(async () =>
             {
                 while (!IsEmpty)
                 {
-                    await Task.Delay(frequency);
+                    await Task.Delay(checkRate);
                 }
 
                 return this;
             });
         }
 
+        /// <summary>
+        /// Gets the default queue.
+        /// </summary>
         public static TaskQueue Default
         {
             get
@@ -216,6 +328,9 @@ namespace Sundstrom.Tasks
 
         private static Dictionary<string, TaskQueue> _queues = new Dictionary<string, TaskQueue>();
 
+        /// <summary>
+        /// Gets the existing queues.
+        /// </summary>
         public static IEnumerable<TaskQueue> Queues
         {
             get
@@ -224,6 +339,12 @@ namespace Sundstrom.Tasks
             }
         }
 
+        /// <summary>
+        /// Creates a queue.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static TaskQueue Create(string tag, object data = null)
         {
             if (string.IsNullOrWhiteSpace(tag))
@@ -241,9 +362,50 @@ namespace Sundstrom.Tasks
             }
         }
 
+        /// <summary>
+        /// Removes the specified queue from the queue collection.
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <returns></returns>
         public static bool Remove(TaskQueue queue)
         {
             return _queues.Remove(queue.Tag);
+        }
+    }
+
+    internal class TaskContext
+    {
+        internal Func<TaskQueue, CancellationToken, Task> Action;
+
+        public TaskContext(TaskQueue queue, Func<TaskQueue, CancellationToken, Task> action)
+        {
+            this.Queue = queue;
+            this.Action = action;
+        }
+
+        public TaskContext(TaskQueue queue, Func<TaskQueue, CancellationToken, Task> action, string taskTag)
+        {
+            this.Queue = queue;
+            this.Action = action;
+            this.Tag = taskTag;
+        }
+
+        public TaskQueue Queue { get; private set; }
+
+        public string Tag { get; private set; }
+
+        public event EventHandler Queued;
+
+        public event EventHandler Executing;
+
+        internal void RaiseQueued()
+        {
+            Queued?.Invoke(this, new EventArgs());
+        }
+
+        internal void RaiseExecuting()
+        {
+            Executing?.Invoke(this, new EventArgs());
         }
     }
 }
