@@ -110,7 +110,7 @@ namespace Sundstrom.Tasks.Tests
 
             TaskQueue.Default.CancelOnException = true;
 
-            TaskQueue.Default.Exception += (sender, args) =>
+            TaskQueue.Default.TaskException += (sender, args) =>
             {
                 tag = args.Tag;
                 Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");

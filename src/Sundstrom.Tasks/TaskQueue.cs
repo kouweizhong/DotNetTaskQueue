@@ -208,9 +208,9 @@ namespace Sundstrom.Tasks
         public bool CancelOnException { get; set; } = false;
 
         /// <summary>
-        /// Raises when an exception is thrown in a scheduled task.
+        /// Raises when an exception is thrown in a executed task.
         /// </summary>
-        public event EventHandler<TaskEventArgs> Exception;
+        public event EventHandler<TaskEventArgs> TaskException;
 
         /// <summary>
         /// Raises when a task is enqueued.
@@ -263,7 +263,7 @@ namespace Sundstrom.Tasks
                         // Handling any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        Exception?.Invoke(this, new TaskEventArgs(this, context.Tag, exc));
+                        TaskException?.Invoke(this, new TaskEventArgs(this, context.Tag, exc));
 
                         if (CancelOnException)
                         {
