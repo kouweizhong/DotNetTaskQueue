@@ -189,7 +189,7 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Gets or sets a value that indicated whether the queue should cancel on exception or not.
+        /// Gets or sets a value that indicates whether or not the queue should cancel on exception.
         /// </summary>
         public bool CancelOnException { get; set; } = false;
 

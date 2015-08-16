@@ -105,29 +105,31 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine("EXCEPTION");
 
+            string tag = null;
             int taskExecutedCount = 0;
 
             TaskQueue.Default.CancelOnException = true;
 
             TaskQueue.Default.Exception += (sender, args) =>
             {
-                Console.WriteLine(args.Exception);
+                tag = args.Tag;
+                Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
             };
 
-            await TaskQueue.Default.Schedule(async (queue, ct) =>
+            await TaskQueue.Default.Schedule("Task 1", async (queue, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
                 await Task.Delay(2000);
 
                 taskExecutedCount++;
-            }).Schedule((queue, ct) =>
+            }).Schedule("Task 2", (queue, ct) =>
             {
                 Console.WriteLine("Item 2: Sync");
                 throw new Exception();
 
                 taskExecutedCount++;
-            }).Schedule(async (queue, ct) =>
+            }).Schedule("Task 3", async (queue, ct) =>
             {
                 Console.WriteLine("Item 3: Async");
 
@@ -137,6 +139,7 @@ namespace Sundstrom.Tasks.Tests
             }).AwaitIsEmpty();
 
             Assert.Equal(taskExecutedCount, 1);
+            Assert.Equal(tag, "Task 2");
         }
     }
 }
