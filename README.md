@@ -6,16 +6,16 @@ Simple task queue for .NET (DNX)
 TaskQueue for x-plat .NET that supports queueing and chaining of sequential tasks - both synchronous and asynchronous code.
 
 ```csharp
-await TaskQueue.Default.Schedule(async (queue, ct) =>
+await TaskQueue.Default.Schedule(async (context, ct) =>
 {
     Console.WriteLine("Item 1: Async");
 
     await Task.Delay(2000);
 
-}).Schedule((queue, ct) =>
+}).Schedule((context, ct) =>
 {
     Console.WriteLine("Item 2: Sync");
-}).Schedule(async (queue, ct) =>
+}).Schedule(async (context, ct) =>
 {
     Console.WriteLine("Item 3: Async");
 
@@ -29,7 +29,7 @@ Handle exceptions:
 // Cancels the rest of the tasks in queue on exception (optional)
 TaskQueue.Default.CancelOnException = true;
 
-TaskQueue.Default.Exception += (sender, args) =>
+TaskQueue.Default.TaskException += (sender, args) =>
 {
     Console.WriteLine(args.Exception);
 };
