@@ -62,7 +62,7 @@ namespace Sundstrom.Tasks
         private static TaskQueue _default;
 
         /// <summary>
-        /// Initializes a queue.
+        /// Initializes a TaskQueue.
         /// </summary>
         public TaskQueue()
         {
@@ -70,7 +70,7 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Initializes a queue with a tag.
+        /// Initializes a TaskQueue with a tag.
         /// </summary>
         /// <param name="tag"></param>
         public TaskQueue(string tag)
@@ -79,7 +79,7 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Initializes a queue with a tag and some data.
+        /// Initializes a TaskQueue with a tag and some data.
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="data"></param>
@@ -90,24 +90,24 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Gets or sets an identifier that is associated with the queue.
+        /// Gets or sets the identifier that is associated with the queue. (if any)
         /// </summary>
-        public string Tag { get; private set; }
+        public string Tag { get; set; }
 
         /// <summary>
         /// Gets or sets some data that is associated with the queue.
         /// </summary>
-        public object Data { get; private set; }
+        public object Data { get; set; }
 
         private void ScheduleInternal(TaskContext context)
         {
             queue.Enqueue(context);
-            TaskEnqueued?.Invoke(this, new TaskEventArgs(this, context.Tag));
+            TaskScheduled?.Invoke(this, new TaskEventArgs(this, context.Tag));
             Next(cts.Token);
         }
 
         /// <summary>
-        /// Schedules a task based on a given function.
+        /// Schedules a task.
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
@@ -118,9 +118,8 @@ namespace Sundstrom.Tasks
             return this;
         }
 
-
         /// <summary>
-        /// Schedules a task based on a given function.
+        /// Schedules a task.
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="action"></param>
@@ -133,7 +132,7 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Schedules a task based on a given action.
+        /// Schedules a task.
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
@@ -145,7 +144,7 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Schedules a task with the specified key based on a given action.
+        /// Schedules a task.
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="action"></param>
@@ -168,7 +167,6 @@ namespace Sundstrom.Tasks
             ScheduleInternal(context);
             return this;
         }
-
 
         /// <summary>
         /// Schedules a task.
@@ -199,7 +197,11 @@ namespace Sundstrom.Tasks
         public void Clear()
         {
             if (_isBusy) throw new InvalidOperationException();
-            queue.Clear();
+            while (queue.Count > 0)
+            {
+                var context = queue.Dequeue();
+                TaskCanceled?.Invoke(this, new TaskEventArgs(this, context.Tag));
+            }
         }
 
         /// <summary>
@@ -213,9 +215,14 @@ namespace Sundstrom.Tasks
         public event EventHandler<TaskEventArgs> TaskException;
 
         /// <summary>
-        /// Raises when a task is enqueued.
+        /// Raises when a task is scheduled.
         /// </summary>
-        public event EventHandler<TaskEventArgs> TaskEnqueued;
+        public event EventHandler<TaskEventArgs> TaskScheduled;
+
+        /// <summary>
+        /// Raises when a task is canceled.
+        /// </summary>
+        public event EventHandler<TaskEventArgs> TaskCanceled;
 
         /// <summary>
         /// Raises when a task is about to be executed.
