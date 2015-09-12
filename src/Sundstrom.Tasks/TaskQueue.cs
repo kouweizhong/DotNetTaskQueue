@@ -7,46 +7,6 @@ using System.Threading.Tasks;
 
 namespace Sundstrom.Tasks
 {
-    public class TaskEventArgs : EventArgs
-    {
-        internal TaskEventArgs(TaskQueue taskQueue, string tag)
-        {
-            TaskQueue = taskQueue;
-            Tag = tag;
-        }
-
-        internal TaskEventArgs(TaskQueue taskQueue, string tag, Exception exception)
-        {
-            TaskQueue = taskQueue;
-            Exception = exception;
-            Tag = tag;
-        }
-
-        /// <summary>
-        /// Gets the tag associated with this task. (if any)
-        /// </summary>
-        public string Tag
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets the queue in this context.
-        /// </summary>
-        public TaskQueue TaskQueue
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets the thrown exception.
-        /// </summary>
-        public Exception Exception
-        {
-            get;
-        }
-    }
-
     /// <summary>
     /// Simple task queue
     /// </summary>
@@ -410,36 +370,5 @@ namespace Sundstrom.Tasks
         {
             return _queues.Remove(queue.Tag);
         }
-    }
-
-    /// <summary>
-    /// Holds the context of a task.
-    /// </summary>
-    public class TaskContext
-    {
-        internal Func<TaskContext, CancellationToken, Task> Action;
-
-        public TaskContext(TaskQueue queue, Func<TaskContext, CancellationToken, Task> action)
-        {
-            this.Queue = queue;
-            this.Action = action;
-        }
-
-        public TaskContext(TaskQueue queue, Func<TaskContext, CancellationToken, Task> action, string taskTag)
-        {
-            this.Queue = queue;
-            this.Action = action;
-            this.Tag = taskTag;
-        }
-
-        /// <summary>
-        /// Gets the queue.
-        /// </summary>
-        public TaskQueue Queue { get; }
-
-        /// <summary>
-        /// Gets the tag. (if any)
-        /// </summary>
-        public string Tag { get; }
     }
 }
