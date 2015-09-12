@@ -48,6 +48,12 @@ See tests for more examples.
 
 Get the latest version of DNX here: https://github.com/aspnet/home
 
+Install the latest currently supported runtime (CoreCLR Beta 7):
+
+```shell
+dnvm install -r CoreCLR -arch x64 1.0.0-beta7
+```
+
 ## Build
 
 To build this solution:
@@ -58,17 +64,14 @@ dnu restore
 dnu build
 ```
 
+This results in a NuGet package.
+
+The package can be consumed by applications that target the full .NET Framework.
+
 ## Test
 
-To run the tests:
+To run the tests (Beta 7 and up):
     
-```shell
-cd Sundstrom.Tasks.Tests
-dnx . test
-```
-
-In the next-coming versions (Beta 7 +) you should be able to just run:
-
 ```shell
 dnx test
 ```

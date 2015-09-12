@@ -12,15 +12,14 @@
     "System.Threading": "4.0.10-beta-23019",
     "System.Runtime": "4.0.10-beta-23019",
     "Microsoft.CSharp": "4.0.0-beta-23019",
-    "xunit": "2.1.0-beta4-*",
-    "xunit.runner.dnx": "2.1.0-beta4-*",
+    "xunit": "2.1.0-rc1-build3168",
+    "xunit.runner.dnx": "2.1.0-beta5-build169",
     "Sundstrom.Tasks": "1.0.0-*"
   },
   "commands": {
     "test": "xunit.runner.dnx"
   },
   "frameworks": {
-    "dnx451": { },
     "dnxcore50": { }
   }
 }
