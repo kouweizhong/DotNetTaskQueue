@@ -42,11 +42,23 @@ Also supports:
 
 See tests for more examples.
 
-## Prerequisites
+## NuGet Package
+
+Feed:
+
+   https://www.myget.org/F/roberts-core-feed/
+
+Install the package:
+
+   PM> Install-Package Sundstrom.Tasks -Version 1.0.0
+   
+
+## Build the project
+###Prerequisites
 
 Get the latest version of .NET Core here: https://github.com/aspnet/home
 
-## Build
+### Steps
 
 To build this solution:
 
