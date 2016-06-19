@@ -1,5 +1,5 @@
 # DotNetTaskQueue
-Simple task queue for .NET (DNX)
+Simple task queue for .NET Core.
 
 ## Description
 
@@ -44,15 +44,7 @@ See tests for more examples.
 
 ## Prerequisites
 
-* DNX (.NET Execution Environment) - currently in Beta
-
-Get the latest version of DNX here: https://github.com/aspnet/home
-
-Install the latest currently supported runtime (CoreCLR Beta 7):
-
-```shell
-dnvm install -r CoreCLR -arch x64 1.0.0-beta7
-```
+Get the latest version of .NET Core here: https://github.com/aspnet/home
 
 ## Build
 
@@ -70,8 +62,8 @@ The package can be consumed by applications that target the full .NET Framework.
 
 ## Test
 
-To run the tests (Beta 7 and up):
+To run the tests (from the Sundstrom.Tasks.Test project):
     
 ```shell
-dnx test
+dotnet test
 ```
