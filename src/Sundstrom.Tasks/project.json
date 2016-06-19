@@ -1,20 +1,31 @@
 ﻿{
   "version": "1.0.0-*",
   "description": "Sundstrom.Tasks Class Library",
-  "authors": [ "Robert Sundström" ],
-  "tags": [ "" ],
+  "authors": [
+    "Robert Sundström"
+  ],
+  "tags": [
+    ""
+  ],
   "projectUrl": "",
   "licenseUrl": "",
-
-  "dependencies": {
-    "Microsoft.CSharp": "4.0.0-*",
-    "System.Collections": "4.0.10-*",
-    "System.Linq": "4.0.0-*",
-    "System.Runtime": "4.0.10-*",
-    "System.Threading": "4.0.10-*"
+  "buildOptions": {
+    "emitEntryPoint": false
   },
-
+  
+  "dependencies": {},
   "frameworks": {
-    "dnxcore50": { }
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-3002702"
+        }
+      },
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ]
+    }
   }
 }

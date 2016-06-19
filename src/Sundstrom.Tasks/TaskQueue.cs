@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -165,9 +164,9 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether or not the queue should cancel on exception.
+        /// Gets or sets a value that indicates whether or not the queue should cancel on exception. (Default: true)
         /// </summary>
-        public bool CancelOnException { get; set; } = false;
+        public bool CancelOnException { get; set; } = true;
 
         /// <summary>
         /// Raises when an exception is thrown in a executed task.
@@ -227,7 +226,7 @@ namespace Sundstrom.Tasks
                     }
                     catch (Exception exc)
                     {
-                        // Handling any exception thrown inside a task.
+                        // Handle any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
                         TaskException?.Invoke(this, new TaskEventArgs(this, context.Tag, exc));
@@ -295,12 +294,15 @@ namespace Sundstrom.Tasks
         /// Waits for the queue to be empty.
         /// </summary>
         /// <param name="checkRate"></param>
+        /// <param name="value"></param>
         /// <returns>The current queue.</returns>
-        public Task<TaskQueue> AwaitIsEmpty(int checkRate = 200)
+        public Task<TaskQueue> AwaitIsEmpty(int checkRate = 200, bool value = true)
         {
             return Task.Run(async () =>
             {
-                while (!IsEmpty)
+                bool condition = !IsEmpty;
+                if(!value) condition = IsEmpty;
+                while (condition)
                 {
                     await Task.Delay(checkRate);
                 }
