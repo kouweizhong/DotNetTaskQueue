@@ -300,9 +300,7 @@ namespace Sundstrom.Tasks
         {
             return Task.Run(async () =>
             {
-                bool condition = !IsEmpty;
-                if(!value) condition = IsEmpty;
-                while (condition)
+                while (IsEmpty == value)
                 {
                     await Task.Delay(checkRate);
                 }
