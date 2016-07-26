@@ -274,6 +274,17 @@ namespace Sundstrom.Tasks
             }
         }
 
+         /// <summary>
+        /// Gets the number of tasks currently in the queue.
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                return queue.Count;
+            }
+        }
+
         /// <summary>
         /// Gets a value that indicates whether this queue is empty of not.
         /// </summary>
@@ -300,7 +311,7 @@ namespace Sundstrom.Tasks
         {
             return Task.Run(async () =>
             {
-                while (IsEmpty == value)
+                while (IsEmpty != value)
                 {
                     await Task.Delay(checkRate);
                 }

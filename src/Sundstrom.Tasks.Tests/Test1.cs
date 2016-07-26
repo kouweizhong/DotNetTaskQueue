@@ -33,7 +33,7 @@ namespace Sundstrom.Tasks.Tests
                 taskExecutedCount++;
             }).AwaitIsEmpty();
 
-            Assert.Equal(taskExecutedCount, 3);
+            Assert.Equal(3, taskExecutedCount);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Sundstrom.Tasks.Tests
                 taskExecutedCount++;
             }).AwaitIsEmpty();
 
-            Assert.Equal(taskExecutedCount, 3);
+            Assert.Equal(3, taskExecutedCount);
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Sundstrom.Tasks.Tests
                 taskExecutedCount++;
             }).AwaitIsEmpty();
 
-            Assert.Equal(taskExecutedCount, 3);
+            Assert.Equal(3, taskExecutedCount);
         }
 
         [Fact]
@@ -138,8 +138,8 @@ namespace Sundstrom.Tasks.Tests
                 taskExecutedCount++;
             }).AwaitIsEmpty();
 
-            Assert.Equal(taskExecutedCount, 1);
-            Assert.Equal(tag, "Task 2");
+            Assert.Equal(1, taskExecutedCount);
+            Assert.Equal("Task 2", tag);
         }
     }
 }

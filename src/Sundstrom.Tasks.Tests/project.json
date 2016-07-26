@@ -4,11 +4,6 @@
   "authors": [
     "Robert Sundström"
   ],
-  "tags": [
-    ""
-  ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "buildOptions": {
     "emitEntryPoint": false
   },
@@ -23,11 +18,11 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0-rc2-3002702"
+          "version": "1.0.0"
         }
       },
       "imports": [
-        "dnxcore50",
+        "dnxcore56",
         "portable-net45+win8"
       ]
     }

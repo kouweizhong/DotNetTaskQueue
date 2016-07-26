@@ -19,11 +19,11 @@
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
-          "version": "1.0.0-rc2-3002702"
+          "version": "1.0.0"
         }
       },
       "imports": [
-        "dnxcore50",
+        "dotnet5.6",
         "portable-net45+win8"
       ]
     }
