@@ -1,5 +1,5 @@
 # DotNetTaskQueue
-Simple task queue for .NET Core.
+Simple task queue for .NET Standard.
 
 ## Description
 
@@ -60,7 +60,7 @@ PM> Install-Package Sundstrom.Tasks -Version 1.0.0
 ## Build the project
 ###Prerequisites
 
-Get the latest version of .NET Core here: https://github.com/aspnet/home
+Get the latest version of .NET SDK here: https://github.com/dotnet/home
 
 ### Steps
 
