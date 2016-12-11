@@ -68,8 +68,9 @@ To build this solution:
 
 ```shell
 cd src
-dnu restore
-dnu build
+dotnet restore
+dotnet build
+dotnet pack
 ```
 
 This results in a NuGet package.
