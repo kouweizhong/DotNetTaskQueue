@@ -53,7 +53,7 @@ https://www.myget.org/F/roberts-core-feed/
 Install the package:
 
 ```
-PM> Install-Package Sundstrom.Tasks -Version 1.0.0
+PM> Install-Package Sundstrom.Tasks
 ```
    
 
