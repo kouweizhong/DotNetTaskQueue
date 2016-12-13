@@ -23,25 +23,11 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets the tag associated with this task. (if any)
         /// </summary>
-        public string Tag
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Gets the queue in this context.
-        /// </summary>
-        public TaskQueue TaskQueue
-        {
-            get;
-        }
+        public string Tag { get; }
 
         /// <summary>
         /// Gets the thrown exception.
         /// </summary>
-        public Exception Exception
-        {
-            get;
-        }
+        public Exception Exception { get; }
     }
 }
