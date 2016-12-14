@@ -7,15 +7,13 @@ namespace Sundstrom.Tasks
 {
     public class TaskEventArgs : EventArgs
     {
-        internal TaskEventArgs(TaskQueue taskQueue, string tag)
-        {
-            TaskQueue = taskQueue;
+        internal TaskEventArgs(string tag)
+        {;
             Tag = tag;
         }
 
-        internal TaskEventArgs(TaskQueue taskQueue, string tag, Exception exception)
+        internal TaskEventArgs(string tag, Exception exception)
         {
-            TaskQueue = taskQueue;
             Exception = exception;
             Tag = tag;
         }

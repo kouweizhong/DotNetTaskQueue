@@ -61,7 +61,7 @@ namespace Sundstrom.Tasks
         private void ScheduleInternal(TaskContext context)
         {
             queue.Enqueue(context);
-            TaskScheduled?.Invoke(this, new TaskEventArgs(this, context.Tag));
+            TaskScheduled?.Invoke(this, new TaskEventArgs(context.Tag));
             Next(cts.Token);
         }
 
@@ -156,10 +156,11 @@ namespace Sundstrom.Tasks
         public void Clear()
         {
             if (_isBusy) throw new InvalidOperationException();
+            
             while (queue.Count > 0)
             {
                 var context = queue.Dequeue();
-                TaskCanceled?.Invoke(this, new TaskEventArgs(this, context.Tag));
+                TaskCanceled?.Invoke(this, new TaskEventArgs(context.Tag));
             }
         }
 
@@ -220,7 +221,7 @@ namespace Sundstrom.Tasks
 
                         // Execute the current task.
 
-                        TaskExecuting?.Invoke(this, new TaskEventArgs(this, context.Tag));
+                        TaskExecuting?.Invoke(this, new TaskEventArgs(context.Tag));
 
                         await context.Action(context, cts.Token);
                     }
@@ -229,7 +230,7 @@ namespace Sundstrom.Tasks
                         // Handle any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        TaskException?.Invoke(this, new TaskEventArgs(this, context.Tag, exc));
+                        TaskException?.Invoke(this, new TaskEventArgs(context.Tag, exc));
 
                         if (CancelOnException)
                         {
@@ -239,7 +240,7 @@ namespace Sundstrom.Tasks
                         }
                     }
 
-                    TaskExecuted?.Invoke(this, new TaskEventArgs(this, context.Tag));
+                    TaskExecuted?.Invoke(this, new TaskEventArgs(context.Tag));
 
                     // Dequeue the currently finished task and request the next.
 
