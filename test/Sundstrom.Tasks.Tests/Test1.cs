@@ -126,9 +126,10 @@ namespace Sundstrom.Tasks.Tests
             }).Schedule("Task 2", (context, ct) =>
             {
                 Console.WriteLine("Item 2: Sync");
-                throw new Exception();
 
                 taskExecutedCount++;
+
+                throw new Exception();
             }).Schedule("Task 3", async (context, ct) =>
             {
                 Console.WriteLine("Item 3: Async");
@@ -138,7 +139,52 @@ namespace Sundstrom.Tasks.Tests
                 taskExecutedCount++;
             }).AwaitIsEmpty();
 
-            Assert.Equal(1, taskExecutedCount);
+            Assert.Equal(2, taskExecutedCount);
+            Assert.Equal("Task 2", tag);
+        }
+
+        [Fact]
+        public async Task Exception_EventHandler_CancelOverride()
+        {
+            Console.WriteLine("EXCEPTION");
+
+            string tag = null;
+            int taskExecutedCount = 0;
+
+            TaskQueue.Default.CancelOnException = true;
+
+            TaskQueue.Default.TaskException += (sender, args) =>
+            {
+                tag = args.Tag;
+                Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
+
+                args.Cancel = false;
+            };
+
+            await TaskQueue.Default.Schedule("Task 1", async (context, ct) =>
+            {
+                Console.WriteLine("Item 1: Async");
+
+                await Task.Delay(2000);
+
+                taskExecutedCount++;
+            }).Schedule("Task 2", (context, ct) =>
+            {
+                Console.WriteLine("Item 2: Sync");
+
+                taskExecutedCount++;
+
+                throw new Exception();
+            }).Schedule("Task 3", async (context, ct) =>
+            {
+                Console.WriteLine("Item 3: Async");
+
+                await Task.Delay(2000);
+
+                taskExecutedCount++;
+            }).AwaitIsEmpty();
+
+            Assert.Equal(3, taskExecutedCount);
             Assert.Equal("Task 2", tag);
         }
     }

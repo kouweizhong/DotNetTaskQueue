@@ -5,27 +5,12 @@ using System.Threading.Tasks;
 
 namespace Sundstrom.Tasks
 {
-    public class TaskEventArgs : EventArgs
+    public class TaskEventArgs : TaskEventArgsBase
     {
         internal TaskEventArgs(string tag)
-        {;
-            Tag = tag;
-        }
-
-        internal TaskEventArgs(string tag, Exception exception)
+            : base(tag)
         {
-            Exception = exception;
-            Tag = tag;
+            
         }
-
-        /// <summary>
-        /// Gets the tag associated with this task. (if any)
-        /// </summary>
-        public string Tag { get; }
-
-        /// <summary>
-        /// Gets the thrown exception.
-        /// </summary>
-        public Exception Exception { get; }
     }
 }
