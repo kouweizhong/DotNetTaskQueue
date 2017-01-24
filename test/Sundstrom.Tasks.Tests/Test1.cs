@@ -187,5 +187,36 @@ namespace Sundstrom.Tasks.Tests
             Assert.Equal(3, taskExecutedCount);
             Assert.Equal("Task 2", tag);
         }
+
+         [Fact]
+        public async Task Run()
+        {
+            var queue = TaskQueue.Default;
+
+            queue.CancelOnException = true;
+
+            queue.TaskException += (s, e) => {
+                Console.WriteLine(e.Tag);
+                e.Cancel = false;
+            };
+
+            for(int i = 0; i < 20; i++) 
+            {
+                int x = i;
+                queue.Schedule($"Task: {x}", async (context, ct) =>
+                {
+                    if(x == 8) 
+                    {
+                        throw new Exception();
+                    }
+
+                    Console.WriteLine($"Task: {x} ({queue.Count} tasks left)");
+
+                    await Task.Delay(2000);
+                });
+            }
+
+            await queue.AwaitIsEmpty();
+        }
     }
 }

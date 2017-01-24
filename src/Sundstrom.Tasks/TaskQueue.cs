@@ -58,7 +58,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public object Data { get; set; }
 
-        private void ScheduleInternal(TaskContext context)
+        private void ScheduleCore(TaskContext context)
         {
             queue.Enqueue(context);
             TaskScheduled?.Invoke(this, new TaskEventArgs(context.Tag));
@@ -73,7 +73,7 @@ namespace Sundstrom.Tasks
         public TaskQueue Schedule(Func<TaskContext, CancellationToken, Task> action)
         {
             var context = new TaskContext(this, action);
-            ScheduleInternal(context);
+            ScheduleCore(context);
             return this;
         }
 
@@ -86,7 +86,7 @@ namespace Sundstrom.Tasks
         public TaskQueue Schedule(string tag, Func<TaskContext, CancellationToken, Task> action)
         {
             var context = new TaskContext(this, action, tag);
-            ScheduleInternal(context);
+            ScheduleCore(context);
             return this;
         }
 
@@ -98,7 +98,7 @@ namespace Sundstrom.Tasks
         public TaskQueue Schedule(Action<TaskContext, CancellationToken> action)
         {
             var context = new TaskContext(this, async (q, ct) => action(q, ct));
-            ScheduleInternal(context);
+            ScheduleCore(context);
             return this;
         }
 
@@ -111,7 +111,7 @@ namespace Sundstrom.Tasks
         public TaskQueue Schedule(string tag, Action<TaskContext, CancellationToken> action)
         {
             var context = new TaskContext(this, async (q, ct) => action(q, ct), tag);
-            ScheduleInternal(context);
+            ScheduleCore(context);
             return this;
         }
 
@@ -123,7 +123,7 @@ namespace Sundstrom.Tasks
         public TaskQueue Schedule(Task task)
         {
             var context = new TaskContext(this, async (q, ct) => await task);
-            ScheduleInternal(context);
+            ScheduleCore(context);
             return this;
         }
 
@@ -136,7 +136,7 @@ namespace Sundstrom.Tasks
         public TaskQueue Schedule(string tag, Task task)
         {
             var context = new TaskContext(this, async (q, ct) => await task);
-            ScheduleInternal(context);
+            ScheduleCore(context);
             return this;
         }
 
@@ -238,7 +238,7 @@ namespace Sundstrom.Tasks
                         {
                             // Cancel the queue.
 
-                            ClearInternal();
+                            ClearCore();
                         }
                     }
 
@@ -260,7 +260,7 @@ namespace Sundstrom.Tasks
             }
         }
 
-        private void ClearInternal()
+        private void ClearCore()
         {
             _isBusy = false;
             Clear();
