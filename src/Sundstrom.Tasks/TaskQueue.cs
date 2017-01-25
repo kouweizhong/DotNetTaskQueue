@@ -61,7 +61,7 @@ namespace Sundstrom.Tasks
         /// Initializes a TaskQueue with a tag.
         /// </summary>
         /// <param name="tag"></param>
-        public TaskQueue(Scheduler scheduler, string tag) 
+        public TaskQueue(Scheduler scheduler, string tag)
         : this(scheduler)
         {
             Tag = tag;
@@ -72,7 +72,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="data"></param>
-        public TaskQueue(Scheduler scheduler, string tag, object data) 
+        public TaskQueue(Scheduler scheduler, string tag, object data)
         : this(scheduler, tag)
         {
             Data = data;
@@ -88,17 +88,17 @@ namespace Sundstrom.Tasks
         /// </summary>
         public object Data { get; set; }
 
-		/// <summary>
-		/// Gets the scheduler.
-		/// </summary>
-		/// <value>The scheduler.</value>
+        /// <summary>
+        /// Gets the scheduler.
+        /// </summary>
+        /// <value>The scheduler.</value>
         public Scheduler Scheduler { get; }
 
-		/// <summary>
-		/// Starts the queue.
-		/// </summary>
-		/// <returns>The start.</returns>
-        public TaskQueue Start() 
+        /// <summary>
+        /// Starts the queue.
+        /// </summary>
+        /// <returns>The start.</returns>
+        public TaskQueue Start()
         {
             SetContext();
 
@@ -106,11 +106,11 @@ namespace Sundstrom.Tasks
             return this;
         }
 
-		/// <summary>
-		/// Schedules a task.
-		/// </summary>
-		/// <returns>The schedule.</returns>
-		/// <param name="task">Task.</param>
+        /// <summary>
+        /// Schedules a task.
+        /// </summary>
+        /// <returns>The schedule.</returns>
+        /// <param name="task">Task.</param>
         public TaskQueue Schedule(TaskInfo task)
         {
             Scheduler.Schedule(_context, task);
@@ -134,39 +134,39 @@ namespace Sundstrom.Tasks
             Scheduler.Clear(_context);
         }
 
-        public TimeSpan Delay 
-        { 
-            get 
+        public TimeSpan Delay
+        {
+            get
             {
                 return _delay;
-            } 
-            set 
+            }
+            set
             {
-                if(Scheduler.IsStarted) 
+                if (Scheduler.IsStarted)
                 {
                     throw new InvalidOperationException("Can not be set when the queue running.");
                 }
                 _delay = value;
-            } 
+            }
         }
 
         /// <summary>
         /// Gets or sets a value that indicates whether or not the queue should cancel on exception. (Default: true)
         /// </summary>
         public bool CancelOnException
-        { 
-            get 
+        {
+            get
             {
                 return _cancelOnException;
-            } 
-            set 
+            }
+            set
             {
-                if(Scheduler.IsStarted) 
+                if (Scheduler.IsStarted)
                 {
                     throw new InvalidOperationException("Can not be set when the queue running.");
                 }
                 _cancelOnException = value;
-            } 
+            }
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Sundstrom.Tasks
             }
         }
 
-         /// <summary>
+        /// <summary>
         /// Gets the number of tasks currently in the queue.
         /// </summary>
         public int Count
@@ -237,7 +237,7 @@ namespace Sundstrom.Tasks
                 return Scheduler.IsEmpty;
             }
         }
-        
+
         /// <summary>
         /// Gets the default queue.
         /// </summary>
@@ -304,39 +304,40 @@ namespace Sundstrom.Tasks
 
         private void SetContext()
         {
-             _context = new SchedulerContext(cts) {
+            _context = new SchedulerContext(cts)
+            {
                 Delay = Delay,
                 CancelOnException = CancelOnException,
-                 
+
                 _taskScheduled = RaiseTaskScheduled,
                 _taskCanceled = RaiseTaskCanceled,
                 _taskExecuting = RaiseTaskExecuting,
                 _taskExecuted = RaiseTaskExecuted,
                 _taskException = RaiseTaskException,
-             };
-        } 
+            };
+        }
 
-        private void RaiseTaskScheduled(TaskEventArgs e) 
+        private void RaiseTaskScheduled(TaskEventArgs e)
         {
             TaskScheduled?.Invoke(this, e);
         }
 
-        private void RaiseTaskCanceled(TaskEventArgs e) 
+        private void RaiseTaskCanceled(TaskEventArgs e)
         {
             TaskCanceled?.Invoke(this, e);
         }
 
-        private void RaiseTaskExecuting(TaskEventArgs e) 
+        private void RaiseTaskExecuting(TaskEventArgs e)
         {
             TaskExecuting?.Invoke(this, e);
         }
 
-        private void RaiseTaskExecuted(TaskEventArgs e) 
+        private void RaiseTaskExecuted(TaskEventArgs e)
         {
             TaskExecuted?.Invoke(this, e);
         }
 
-        private void RaiseTaskException(TaskExceptionEventArgs e) 
+        private void RaiseTaskException(TaskExceptionEventArgs e)
         {
             TaskException?.Invoke(this, e);
         }

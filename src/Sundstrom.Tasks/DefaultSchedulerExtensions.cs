@@ -16,8 +16,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Schedule(this TaskQueue source, Func<TaskInfo, CancellationToken, Task> action)
         {
-            var context = new TaskInfo(source, action);
-            return source.Schedule(context);
+            var taskInfo = new TaskInfo(source, action);
+            return source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Schedule(this TaskQueue source, string tag, Func<TaskInfo, CancellationToken, Task> action)
         {
-            var context = new TaskInfo(source, action, tag);
-            return source.Schedule(context);
+            var taskInfo = new TaskInfo(source, action, tag);
+            return source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Schedule(this TaskQueue source, Action<TaskInfo, CancellationToken> action)
         {
-            var context = new TaskInfo(source, async (q, ct) => action(q, ct));
-            return source.Schedule(context);
+            var taskInfo = new TaskInfo(source, async (q, ct) => action(q, ct));
+            return source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Schedule(this TaskQueue source, string tag, Action<TaskInfo, CancellationToken> action)
         {
-            var context = new TaskInfo(source, async (q, ct) => action(q, ct), tag);
-            return source.Schedule(context);
+            var taskInfo = new TaskInfo(source, async (q, ct) => action(q, ct), tag);
+            return source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Schedule(this TaskQueue source, Task task)
         {
-            var context = new TaskInfo(source, async (q, ct) => await task);
-            return source.Schedule(context);
+            var taskInfo = new TaskInfo(source, async (q, ct) => await task);
+            return source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Schedule(this TaskQueue source, string tag, Task task)
         {
-            var context = new TaskInfo(source, async (q, ct) => await task);
-            return source.Schedule(context);
+            var taskInfo = new TaskInfo(source, async (q, ct) => await task);
+            return source.Schedule(taskInfo);
         }
 
            /// <summary>
