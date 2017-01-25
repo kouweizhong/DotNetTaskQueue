@@ -20,7 +20,9 @@ await TaskQueue.Default.Schedule(async (context, ct) =>
     Console.WriteLine("Item 3: Async");
 
     await Task.Delay(2000);
-}).AwaitIsEmpty();
+})
+.Start()
+.AwaitIsEmpty();
 ```
 
 Handle exceptions:
@@ -33,6 +35,8 @@ TaskQueue.Default.TaskException += (sender, args) =>
 {
     Console.WriteLine(args.Exception);
 };
+
+TaskQueue.Default.Start();
 ```
 
 Also supports:
