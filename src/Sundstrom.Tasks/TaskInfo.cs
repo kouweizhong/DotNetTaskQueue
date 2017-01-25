@@ -9,17 +9,17 @@ namespace Sundstrom.Tasks
     /// <summary>
     /// Holds the context of a task.
     /// </summary>
-    public class TaskContext
+    public class TaskInfo
     {
-        internal Func<TaskContext, CancellationToken, Task> Action;
+        internal Func<TaskInfo, CancellationToken, Task> Action;
 
-        public TaskContext(TaskQueue queue, Func<TaskContext, CancellationToken, Task> action)
+        public TaskInfo(TaskQueue queue, Func<TaskInfo, CancellationToken, Task> action)
         {
             this.Queue = queue;
             this.Action = action;
         }
 
-        public TaskContext(TaskQueue queue, Func<TaskContext, CancellationToken, Task> action, string taskTag)
+        public TaskInfo(TaskQueue queue, Func<TaskInfo, CancellationToken, Task> action, string taskTag)
         {
             this.Queue = queue;
             this.Action = action;

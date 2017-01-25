@@ -13,10 +13,9 @@ namespace Sundstrom.Tasks
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
 
-        private Queue<TaskContext> queue = new Queue<TaskContext>();
-
-        private bool _isBusy = false;
-        private bool _isRunning;
+        private SchedulerContext _context;
+        private bool _cancelOnException = true;
+        private TimeSpan _delay;
 
         private static TaskQueue _default;
 
@@ -25,14 +24,14 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue()
         {
-
+            Scheduler = new DefaultScheduler();
         }
 
         /// <summary>
         /// Initializes a TaskQueue with a tag.
         /// </summary>
         /// <param name="tag"></param>
-        public TaskQueue(string tag)
+        public TaskQueue(string tag) : this()
         {
             Tag = tag;
         }
@@ -43,8 +42,38 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="data"></param>
         public TaskQueue(string tag, object data)
+            : this(tag)
+        {
+            Data = data;
+        }
+
+
+        /// <summary>
+        /// Initializes a TaskQueue.
+        /// </summary>
+        public TaskQueue(Scheduler scheduler)
+        {
+            Scheduler = scheduler;
+        }
+
+        /// <summary>
+        /// Initializes a TaskQueue with a tag.
+        /// </summary>
+        /// <param name="tag"></param>
+        public TaskQueue(Scheduler scheduler, string tag) 
+        : this(scheduler)
         {
             Tag = tag;
+        }
+
+        /// <summary>
+        /// Initializes a TaskQueue with a tag and some data.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="data"></param>
+        public TaskQueue(Scheduler scheduler, string tag, object data) 
+        : this(scheduler, tag)
+        {
             Data = data;
         }
 
@@ -58,96 +87,42 @@ namespace Sundstrom.Tasks
         /// </summary>
         public object Data { get; set; }
 
-        private void ScheduleCore(TaskContext context)
-        {
-            queue.Enqueue(context);
-            TaskScheduled?.Invoke(this, new TaskEventArgs(context.Tag));
-            Next(cts.Token);
-        }
+		/// <summary>
+		/// Gets the scheduler.
+		/// </summary>
+		/// <value>The scheduler.</value>
+        public Scheduler Scheduler { get; }
 
-        /// <summary>
-        /// Schedules a task.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public TaskQueue Schedule(Func<TaskContext, CancellationToken, Task> action)
+		/// <summary>
+		/// Starts the queue.
+		/// </summary>
+		/// <returns>The start.</returns>
+        public TaskQueue Start() 
         {
-            var context = new TaskContext(this, action);
-            ScheduleCore(context);
+            SetContext();
+
+            Scheduler.Start(_context);
             return this;
         }
 
-        /// <summary>
-        /// Schedules a task.
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public TaskQueue Schedule(string tag, Func<TaskContext, CancellationToken, Task> action)
+		/// <summary>
+		/// Schedules a task.
+		/// </summary>
+		/// <returns>The schedule.</returns>
+		/// <param name="task">Task.</param>
+        public TaskQueue Schedule(TaskInfo task)
         {
-            var context = new TaskContext(this, action, tag);
-            ScheduleCore(context);
-            return this;
-        }
-
-        /// <summary>
-        /// Schedules a task.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public TaskQueue Schedule(Action<TaskContext, CancellationToken> action)
-        {
-            var context = new TaskContext(this, async (q, ct) => action(q, ct));
-            ScheduleCore(context);
-            return this;
-        }
-
-        /// <summary>
-        /// Schedules a task.
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public TaskQueue Schedule(string tag, Action<TaskContext, CancellationToken> action)
-        {
-            var context = new TaskContext(this, async (q, ct) => action(q, ct), tag);
-            ScheduleCore(context);
-            return this;
-        }
-
-        /// <summary>
-        /// Schedules a task.
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        public TaskQueue Schedule(Task task)
-        {
-            var context = new TaskContext(this, async (q, ct) => await task);
-            ScheduleCore(context);
-            return this;
-        }
-
-        /// <summary>
-        /// Schedules a task.
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        public TaskQueue Schedule(string tag, Task task)
-        {
-            var context = new TaskContext(this, async (q, ct) => await task);
-            ScheduleCore(context);
+            Scheduler.Schedule(_context, task);
             return this;
         }
 
         /// <summary>
         /// Cancels the queue.
         /// </summary>
-        public void Cancel()
+        public TaskQueue Cancel()
         {
-            cts.Cancel();
-            _isRunning = false;
-            _isBusy = false;
+            Scheduler.Cancel(_context);
+            return this;
         }
 
         /// <summary>
@@ -155,19 +130,43 @@ namespace Sundstrom.Tasks
         /// </summary>
         public void Clear()
         {
-            if (_isBusy) throw new InvalidOperationException();
-            
-            while (queue.Count > 0)
+            Scheduler.Clear(_context);
+        }
+
+        public TimeSpan Delay 
+        { 
+            get 
             {
-                var context = queue.Dequeue();
-                TaskCanceled?.Invoke(this, new TaskEventArgs(context.Tag));
-            }
+                return _delay;
+            } 
+            set 
+            {
+                if(Scheduler.IsStarted) 
+                {
+                    throw new InvalidOperationException("Can not be set when the queue running.");
+                }
+                _delay = value;
+            } 
         }
 
         /// <summary>
         /// Gets or sets a value that indicates whether or not the queue should cancel on exception. (Default: true)
         /// </summary>
-        public bool CancelOnException { get; set; } = true;
+        public bool CancelOnException
+        { 
+            get 
+            {
+                return _cancelOnException;
+            } 
+            set 
+            {
+                if(Scheduler.IsStarted) 
+                {
+                    throw new InvalidOperationException("Can not be set when the queue running.");
+                }
+                _cancelOnException = value;
+            } 
+        }
 
         /// <summary>
         /// Raises when an exception is thrown in a executed task.
@@ -194,76 +193,15 @@ namespace Sundstrom.Tasks
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskExecuted;
 
-        private async Task Next(CancellationToken cancellationToken)
+        /// <summary>
+        /// Gets a value that indicates whether this queue is started or not.
+        /// </summary>
+        public bool IsStarted
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
-            if (!_isBusy)
+            get
             {
-                if (queue.Count > 0)
-                {
-                    // Optional delay.
-
-                    if (Delay > default(TimeSpan))
-                    {
-                        await Task.Delay(Delay);
-                    }
-
-                    // Peek the current task.
-
-                    var context = queue.Peek();
-
-                    try
-                    {
-                        _isRunning = true;
-                        _isBusy = true;
-
-                        // Execute the current task.
-
-                        TaskExecuting?.Invoke(this, new TaskEventArgs(context.Tag));
-
-                        await context.Action(context, cts.Token);
-                    }
-                    catch (Exception exc)
-                    {
-                        // Handle any exception thrown inside a task.
-                        // Invoke the Exception event handlers.
-
-                        var eventArgs = new TaskExceptionEventArgs(context.Tag, exc, CancelOnException);
-
-                        TaskException?.Invoke(this, eventArgs);
-
-                        if (eventArgs.Cancel)
-                        {
-                            // Cancel the queue.
-
-                            ClearCore();
-                        }
-                    }
-
-                    TaskExecuted?.Invoke(this, new TaskEventArgs(context.Tag));
-
-                    // Dequeue the currently finished task and request the next.
-
-                    if (queue.Count > 0)
-                    {
-                        queue.Dequeue();
-                    }
-                    _isBusy = false;
-                    await Next(cts.Token);
-                }
+                return Scheduler.IsStarted;
             }
-            else
-            {
-                _isRunning = false;
-            }
-        }
-
-        private void ClearCore()
-        {
-            _isBusy = false;
-            Clear();
         }
 
         /// <summary>
@@ -273,7 +211,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return _isRunning;
+                return Scheduler.IsRunning;
             }
         }
 
@@ -284,7 +222,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return queue.Count;
+                return Scheduler.Count;
             }
         }
 
@@ -295,34 +233,10 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return queue.Count == 0;
+                return Scheduler.IsEmpty;
             }
         }
-
-        /// <summary>
-        /// Gets or sets the the delay between each task.
-        /// </summary>
-        public TimeSpan Delay { get; set; }
-
-        /// <summary>
-        /// Waits for the queue to be empty.
-        /// </summary>
-        /// <param name="checkRate"></param>
-        /// <param name="value"></param>
-        /// <returns>The current queue.</returns>
-        public Task<TaskQueue> AwaitIsEmpty(int checkRate = 200, bool value = true)
-        {
-            return Task.Run(async () =>
-            {
-                while (IsEmpty != value)
-                {
-                    await Task.Delay(checkRate);
-                }
-
-                return this;
-            });
-        }
-
+        
         /// <summary>
         /// Gets the default queue.
         /// </summary>
@@ -384,5 +298,48 @@ namespace Sundstrom.Tasks
         {
             return _queues.Remove(queue.Tag);
         }
+
+        #region Internals
+
+        private void SetContext()
+        {
+             _context = new SchedulerContext(cts) {
+                Delay = Delay,
+                CancelOnException = CancelOnException,
+                 
+                _taskScheduled = RaiseTaskScheduled,
+                _taskCanceled = RaiseTaskCanceled,
+                _taskExecuting = RaiseTaskExecuting,
+                _taskExecuted = RaiseTaskExecuted,
+                _taskException = RaiseTaskException,
+             };
+        } 
+
+        private void RaiseTaskScheduled(TaskEventArgs e) 
+        {
+            TaskScheduled?.Invoke(this, e);
+        }
+
+        private void RaiseTaskCanceled(TaskEventArgs e) 
+        {
+            TaskCanceled?.Invoke(this, e);
+        }
+
+        private void RaiseTaskExecuting(TaskEventArgs e) 
+        {
+            TaskExecuting?.Invoke(this, e);
+        }
+
+        private void RaiseTaskExecuted(TaskEventArgs e) 
+        {
+            TaskExecuted?.Invoke(this, e);
+        }
+
+        private void RaiseTaskException(TaskExceptionEventArgs e) 
+        {
+            TaskException?.Invoke(this, e);
+        }
+
+        #endregion
     }
 }

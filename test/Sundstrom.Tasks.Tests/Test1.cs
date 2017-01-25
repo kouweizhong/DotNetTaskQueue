@@ -12,11 +12,13 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Synchronous()
         {
+            var queue = TaskQueue.Create("1").Start();
+
             Console.WriteLine("SYNCHRONOUS");
 
             int taskExecutedCount = 0;
 
-            await TaskQueue.Default.Schedule("Task 1", (context, ct) =>
+            await queue.Schedule("Task 1", (context, ct) =>
             {
                 Console.WriteLine("Item 1");
 
@@ -39,11 +41,13 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Asynchronous()
         {
+            var queue = TaskQueue.Create("2").Start();
+
             Console.WriteLine("ASYNCHRONOUS");
 
             int taskExecutedCount = 0;
 
-            await TaskQueue.Default.Schedule("Task 1", async (context, ct) =>
+            await queue.Schedule("Task 1", async (context, ct) =>
             {
                 Console.WriteLine("Item 1");
 
@@ -72,11 +76,13 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Combo()
         {
+            var queue = TaskQueue.Create("3").Start();
+
             Console.WriteLine("COMBO");
 
             int taskExecutedCount = 0;
 
-            await TaskQueue.Default.Schedule("Task 1", async (context, ct) =>
+            await queue.Schedule("Task 1", async (context, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
@@ -108,15 +114,19 @@ namespace Sundstrom.Tasks.Tests
             string tag = null;
             int taskExecutedCount = 0;
 
-            TaskQueue.Default.CancelOnException = true;
+            var queue = TaskQueue.Create("4");
 
-            TaskQueue.Default.TaskException += (sender, args) =>
+            queue.CancelOnException = true;
+
+			queue.Start();
+
+            queue.TaskException += (sender, args) =>
             {
                 tag = args.Tag;
                 Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
             };
 
-            await TaskQueue.Default.Schedule("Task 1", async (context, ct) =>
+            await queue.Schedule("Task 1", async (context, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
@@ -151,9 +161,13 @@ namespace Sundstrom.Tasks.Tests
             string tag = null;
             int taskExecutedCount = 0;
 
-            TaskQueue.Default.CancelOnException = true;
+            var queue = TaskQueue.Create("5");
 
-            TaskQueue.Default.TaskException += (sender, args) =>
+            queue.CancelOnException = true;
+
+			queue.Start();
+
+            queue.TaskException += (sender, args) =>
             {
                 tag = args.Tag;
                 Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
@@ -161,7 +175,7 @@ namespace Sundstrom.Tasks.Tests
                 args.Cancel = false;
             };
 
-            await TaskQueue.Default.Schedule("Task 1", async (context, ct) =>
+            await queue.Schedule("Task 1", async (context, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
@@ -191,9 +205,11 @@ namespace Sundstrom.Tasks.Tests
          [Fact]
         public async Task Run()
         {
-            var queue = TaskQueue.Default;
+			var queue = TaskQueue.Create("6");
 
             queue.CancelOnException = true;
+
+			queue.Start();
 
             queue.TaskException += (s, e) => {
                 Console.WriteLine(e.Tag);
