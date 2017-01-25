@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Sundstrom.Tasks;
+using Sundstrom.Tasks.Scheduling;
 
 namespace Sundstrom.Tasks.Tests
 {
