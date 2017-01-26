@@ -14,6 +14,8 @@ namespace Sundstrom.Tasks
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
 
+        private Queue<TaskInfo> queue = new Queue<TaskInfo>();
+
         private SchedulerContext _context;
         private bool _cancelOnException = true;
         private TimeSpan _delay;
@@ -25,7 +27,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue()
         {
-            Scheduler = DefaultScheduler.Instance;
+            Scheduler = new DefaultScheduler();
         }
 
         /// <summary>
@@ -143,7 +145,7 @@ namespace Sundstrom.Tasks
             {
                 if (Scheduler.IsStarted)
                 {
-                    throw new InvalidOperationException("Can not be set when the queue running.");
+                    throw new InvalidOperationException("Can not be set when the queue is running.");
                 }
                 _delay = value;
             }
@@ -162,7 +164,7 @@ namespace Sundstrom.Tasks
             {
                 if (Scheduler.IsStarted)
                 {
-                    throw new InvalidOperationException("Can not be set when the queue running.");
+                    throw new InvalidOperationException("Can not be set when the queue is running.");
                 }
                 _cancelOnException = value;
             }
@@ -222,7 +224,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return Scheduler.Count;
+                return queue.Count;
             }
         }
 
@@ -233,7 +235,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return Scheduler.IsEmpty;
+                return queue.Count > 0;
             }
         }
 
@@ -274,7 +276,7 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Create(string tag, object data = null)
         {
-            return Create(DefaultScheduler.Instance, tag, data);
+            return Create(new DefaultScheduler(), tag, data);
         }
 
         /// <summary>
@@ -318,7 +320,7 @@ namespace Sundstrom.Tasks
 
         private void SetContext()
         {
-            _context = new SchedulerContext(cts)
+            _context = new SchedulerContext(queue, cts)
             {
                 Delay = Delay,
                 CancelOnException = CancelOnException,

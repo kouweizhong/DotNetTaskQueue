@@ -9,32 +9,16 @@ namespace Sundstrom.Tasks.Scheduling
 {
     public sealed class DefaultScheduler : Scheduler
     {
-        private static DefaultScheduler _instance = new DefaultScheduler();
-
-        public static DefaultScheduler Instance 
-        {
-            get 
-            {
-                return _instance;
-            }
-        }
-
-        private DefaultScheduler() 
+        public DefaultScheduler() 
         {
 
         }
-
-        private Queue<TaskInfo> queue = new Queue<TaskInfo>();
 
         private bool _isStarted;
 
         private bool _isRunning;
 
         private bool _isBusy;
-
-        public override int Count => queue.Count;
-
-        public override bool IsEmpty => queue.Count == 0;
 
         public override bool IsStarted
         {
@@ -65,7 +49,7 @@ namespace Sundstrom.Tasks.Scheduling
                     return;
                 }
 
-                if (queue.Count > 0)
+                if (context.Queue.Count > 0)
                 {
                     // Optional delay.
 
@@ -76,7 +60,7 @@ namespace Sundstrom.Tasks.Scheduling
 
                     // Peek the current task.
 
-                    var task = queue.Peek();
+                    var task = context.Queue.Peek();
 
                     try
                     {
@@ -110,9 +94,9 @@ namespace Sundstrom.Tasks.Scheduling
 
                     // Dequeue the currently finished task and request the next.
 
-                    if (queue.Count > 0)
+                    if (context.Queue.Count > 0)
                     {
-                        queue.Dequeue();
+                        context.Queue.Dequeue();
                     }
                     _isBusy = false;
                     await Next(context);
@@ -126,7 +110,7 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override void Schedule(SchedulerContext context, TaskInfo task)
         {
-            queue.Enqueue(task);
+            context.Queue.Enqueue(task);
             context.RaiseTaskScheduled(new TaskEventArgs(task.Tag));
 
             Next(context);
@@ -150,9 +134,9 @@ namespace Sundstrom.Tasks.Scheduling
         {
             if (_isBusy) throw new InvalidOperationException();
 
-            while (queue.Count > 0)
+            while (context.Queue.Count > 0)
             {
-                var task = queue.Dequeue();
+                var task = context.Queue.Dequeue();
                 context.RaiseTaskCanceled(new TaskEventArgs(task.Tag));
             }
         }

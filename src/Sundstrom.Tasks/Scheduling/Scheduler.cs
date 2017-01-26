@@ -19,10 +19,6 @@ namespace Sundstrom.Tasks.Scheduling
 
         public abstract void Cancel(SchedulerContext context);
 
-        public abstract int Count { get; }
-
-        public abstract bool IsEmpty { get; }
-
         public abstract bool IsStarted { get; }
 
         public abstract bool IsRunning { get; }

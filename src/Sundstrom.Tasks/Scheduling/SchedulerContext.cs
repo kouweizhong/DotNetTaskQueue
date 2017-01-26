@@ -17,9 +17,11 @@ namespace Sundstrom.Tasks.Scheduling
         internal Action<TaskEventArgs> _taskExecuted;
         internal Action<TaskExceptionEventArgs> _taskException;
 
-        public SchedulerContext(CancellationTokenSource cts)
+        public SchedulerContext(Queue<TaskInfo> queue, CancellationTokenSource cts)
         {
             this.cts = cts;
+            
+            this.Queue = queue;
         }
 
         internal CancellationTokenSource CancellationTokenSource => cts;
@@ -29,6 +31,8 @@ namespace Sundstrom.Tasks.Scheduling
         public TimeSpan Delay { get; internal set; }
 
         public bool CancelOnException { get; internal set; }
+
+        public Queue<TaskInfo> Queue { get; }
 
         public void RaiseTaskScheduled(TaskEventArgs e)
         {

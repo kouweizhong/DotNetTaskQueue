@@ -236,6 +236,8 @@ namespace Sundstrom.Tasks.Tests
             }
 
             await queue.AwaitIsEmpty();
+
+            Console.WriteLine($"End");
         }
 
         [Fact]
