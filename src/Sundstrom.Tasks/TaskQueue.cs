@@ -25,7 +25,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue()
         {
-            Scheduler = new DefaultScheduler();
+            Scheduler = DefaultScheduler.Instance;
         }
 
         /// <summary>
@@ -47,7 +47,6 @@ namespace Sundstrom.Tasks
         {
             Data = data;
         }
-
 
         /// <summary>
         /// Initializes a TaskQueue.
@@ -275,12 +274,27 @@ namespace Sundstrom.Tasks
         /// <returns></returns>
         public static TaskQueue Create(string tag, object data = null)
         {
+            return Create(DefaultScheduler.Instance, tag, data);
+        }
+
+        /// <summary>
+        /// Creates a queue with a specified Scheduler.
+        /// </summary>
+        /// <param name="scheduler"></param>
+        /// <param name="tag"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static TaskQueue Create(Scheduler scheduler, string tag, object data = null)
+        {
+            if (scheduler == null)
+                throw new ArgumentNullException(nameof(scheduler));
+
             if (string.IsNullOrWhiteSpace(tag))
-                throw new ArgumentNullException("tag", "Null, whitespaces or an empty string is not allowed for tags.");
+                throw new ArgumentNullException(nameof(tag), "Null, whitespaces or an empty string is not allowed for tags.");
 
             try
             {
-                var queue = new TaskQueue(tag, data);
+                var queue = new TaskQueue(scheduler, tag, data);
                 _queues[tag] = queue;
                 return queue;
             }

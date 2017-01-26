@@ -120,7 +120,7 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
-			queue.Start();
+            queue.Start();
 
             queue.TaskException += (sender, args) =>
             {
@@ -167,7 +167,7 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
-			queue.Start();
+            queue.Start();
 
             queue.TaskException += (sender, args) =>
             {
@@ -204,26 +204,27 @@ namespace Sundstrom.Tasks.Tests
             Assert.Equal("Task 2", tag);
         }
 
-         [Fact]
+        [Fact]
         public async Task Run()
         {
-			var queue = TaskQueue.Create("6");
+            var queue = TaskQueue.Create("6");
 
             queue.CancelOnException = true;
 
-			queue.Start();
+            queue.Start();
 
-            queue.TaskException += (s, e) => {
+            queue.TaskException += (s, e) =>
+            {
                 Console.WriteLine(e.Tag);
                 e.Cancel = false;
             };
 
-            for(int i = 0; i < 20; i++) 
+            for (int i = 0; i < 20; i++)
             {
                 int x = i;
                 queue.Schedule($"Task: {x}", async (context, ct) =>
                 {
-                    if(x == 8) 
+                    if (x == 8)
                     {
                         throw new Exception();
                     }
@@ -235,6 +236,20 @@ namespace Sundstrom.Tasks.Tests
             }
 
             await queue.AwaitIsEmpty();
+        }
+
+        [Fact]
+        public async Task Run2()
+        {
+            var queue = TaskQueue.Create("7");
+
+            queue.CancelOnException = true;
+
+            await queue.Schedule(async (context, ct) => {
+                Console.WriteLine("Hello World!");
+            })
+            .Start()
+            .AwaitIsEmpty();
         }
     }
 }

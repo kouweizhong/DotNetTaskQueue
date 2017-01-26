@@ -9,6 +9,21 @@ namespace Sundstrom.Tasks.Scheduling
 {
     public sealed class DefaultScheduler : Scheduler
     {
+        private static DefaultScheduler _instance = new DefaultScheduler();
+
+        public static DefaultScheduler Instance 
+        {
+            get 
+            {
+                return _instance;
+            }
+        }
+
+        private DefaultScheduler() 
+        {
+
+        }
+
         private Queue<TaskInfo> queue = new Queue<TaskInfo>();
 
         private bool _isStarted;
