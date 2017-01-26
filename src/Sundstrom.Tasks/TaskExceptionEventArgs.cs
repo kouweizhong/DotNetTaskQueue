@@ -18,7 +18,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets the associated exception.
         /// </summary>
-        public Exception Exception { get; } 
+        public Exception Exception { get; }
 
         /// <summary>
         /// Gets or sets whether the queue should cancel or not.

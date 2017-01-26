@@ -78,7 +78,7 @@ namespace Sundstrom.Tasks
             return source.Schedule(taskInfo);
         }
 
-           /// <summary>
+        /// <summary>
         /// Waits for the queue to be empty.
         /// </summary>
         /// <param name="checkRate"></param>

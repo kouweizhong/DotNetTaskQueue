@@ -10,7 +10,7 @@ namespace Sundstrom.Tasks
         internal TaskEventArgs(string tag)
             : base(tag)
         {
-            
+
         }
     }
 }

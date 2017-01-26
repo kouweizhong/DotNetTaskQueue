@@ -8,7 +8,7 @@ using Sundstrom.Tasks;
 namespace Sundstrom.Tasks.Scheduling
 {
     public sealed class DefaultScheduler : Scheduler
-    { 
+    {
         private Queue<TaskInfo> queue = new Queue<TaskInfo>();
 
         private bool _isStarted;
@@ -23,7 +23,7 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override bool IsStarted
         {
-            get 
+            get
             {
                 return _isStarted;
             }
@@ -31,21 +31,21 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override bool IsRunning
         {
-            get 
+            get
             {
                 return _isRunning;
             }
         }
 
-        public override async Task Next(SchedulerContext context) 
+        public override async Task Next(SchedulerContext context)
         {
-           if (context.CancellationToken.IsCancellationRequested)
+            if (context.CancellationToken.IsCancellationRequested)
                 return;
 
             if (!_isBusy)
             {
                 // Do not fetch next task if the queue has not been started.
-                if (!_isStarted) 
+                if (!_isStarted)
                 {
                     return;
                 }
@@ -119,14 +119,14 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override void Cancel(SchedulerContext context)
         {
-            if(!_isStarted)
+            if (!_isStarted)
             {
                 throw new InvalidCastException("Queue has not been started.");
             }
 
             context.CancellationTokenSource.Cancel();
 
-             _isStarted = false;
+            _isStarted = false;
             _isRunning = false;
             _isBusy = false;
         }
@@ -134,7 +134,7 @@ namespace Sundstrom.Tasks.Scheduling
         public override void Clear(SchedulerContext context)
         {
             if (_isBusy) throw new InvalidOperationException();
-            
+
             while (queue.Count > 0)
             {
                 var task = queue.Dequeue();
@@ -142,7 +142,7 @@ namespace Sundstrom.Tasks.Scheduling
             }
         }
 
-        private void ClearCore(SchedulerContext context) 
+        private void ClearCore(SchedulerContext context)
         {
             _isBusy = false;
             Clear(context);
@@ -150,7 +150,7 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override void Start(SchedulerContext context)
         {
-            if(_isStarted)
+            if (_isStarted)
             {
                 throw new InvalidCastException("Queue has already been started.");
             }

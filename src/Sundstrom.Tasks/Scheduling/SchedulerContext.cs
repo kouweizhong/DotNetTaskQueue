@@ -30,27 +30,27 @@ namespace Sundstrom.Tasks.Scheduling
 
         public bool CancelOnException { get; internal set; }
 
-        public void RaiseTaskScheduled(TaskEventArgs e) 
+        public void RaiseTaskScheduled(TaskEventArgs e)
         {
             this._taskScheduled(e);
         }
 
-        public void RaiseTaskCanceled(TaskEventArgs e) 
+        public void RaiseTaskCanceled(TaskEventArgs e)
         {
             this._taskCanceled(e);
         }
 
-        public void RaiseTaskExecuting(TaskEventArgs e) 
+        public void RaiseTaskExecuting(TaskEventArgs e)
         {
             this._taskExecuting(e);
         }
 
-        public void RaiseTaskExecuted(TaskEventArgs e) 
+        public void RaiseTaskExecuted(TaskEventArgs e)
         {
             this._taskExecuted(e);
         }
 
-        public void RaiseTaskException(TaskExceptionEventArgs e) 
+        public void RaiseTaskException(TaskExceptionEventArgs e)
         {
             this._taskException(e);
         }
