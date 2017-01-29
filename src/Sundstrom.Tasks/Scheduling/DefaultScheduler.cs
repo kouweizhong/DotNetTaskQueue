@@ -20,6 +20,8 @@ namespace Sundstrom.Tasks.Scheduling
 
         private bool _isBusy;
 
+        private TaskInfo _current;
+
         public override bool IsStarted
         {
             get
@@ -33,6 +35,14 @@ namespace Sundstrom.Tasks.Scheduling
             get
             {
                 return _isRunning;
+            }
+        }
+
+        public override TaskInfo Current
+        {
+            get
+            {
+                return _current;
             }
         }
 
@@ -61,6 +71,8 @@ namespace Sundstrom.Tasks.Scheduling
                     // Peek the current task.
 
                     var task = context.Queue.Peek();
+
+                    _current = task;
 
                     try
                     {
@@ -92,6 +104,8 @@ namespace Sundstrom.Tasks.Scheduling
 
                     context.RaiseTaskExecuted(new TaskEventArgs(task.Tag));
 
+                    _current = null;
+
                     // Dequeue the currently finished task and request the next.
 
                     if (context.Queue.Count > 0)
@@ -116,7 +130,7 @@ namespace Sundstrom.Tasks.Scheduling
             Next(context);
         }
 
-        public override void Cancel(SchedulerContext context)
+        public override void Stop(SchedulerContext context)
         {
             if (!_isStarted)
             {
@@ -128,6 +142,25 @@ namespace Sundstrom.Tasks.Scheduling
             _isStarted = false;
             _isRunning = false;
             _isBusy = false;
+        }
+
+        public override void Deschedule(SchedulerContext context, TaskInfo task)
+        {
+            var item = context.Queue.FirstOrDefault(x => x == task);
+            if(item == null) 
+            {
+                throw new InvalidOperationException("Not part of this queue.");
+            }
+
+            var e = new TaskCancelingEventArgs(task.Tag, true);
+            context.RaiseTaskCanceling(e);
+            if(e.Cancel) 
+            {
+                context.Remove(item);
+
+                var e2 = new TaskEventArgs(task.Tag);
+                context.RaiseTaskCanceled(e2);
+            }
         }
 
         public override void Clear(SchedulerContext context)

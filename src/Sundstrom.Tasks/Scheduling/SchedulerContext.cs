@@ -12,6 +12,7 @@ namespace Sundstrom.Tasks.Scheduling
         private CancellationTokenSource cts = new CancellationTokenSource();
 
         internal Action<TaskEventArgs> _taskScheduled;
+        internal Action<TaskCancelingEventArgs> _taskCanceling;
         internal Action<TaskEventArgs> _taskCanceled;
         internal Action<TaskEventArgs> _taskExecuting;
         internal Action<TaskEventArgs> _taskExecuted;
@@ -32,11 +33,21 @@ namespace Sundstrom.Tasks.Scheduling
 
         public bool CancelOnException { get; internal set; }
 
-        public Queue<TaskInfo> Queue { get; }
+        public Queue<TaskInfo> Queue { get; private set; }
+
+        public void Remove(TaskInfo task) 
+        {
+            Queue = new Queue<TaskInfo>(Queue.Where(x => x != task));
+        }
 
         public void RaiseTaskScheduled(TaskEventArgs e)
         {
             this._taskScheduled(e);
+        }
+
+        public void RaiseTaskCanceling(TaskCancelingEventArgs e)
+        {
+            this._taskCanceling(e);
         }
 
         public void RaiseTaskCanceled(TaskEventArgs e)

@@ -235,6 +235,10 @@ namespace Sundstrom.Tasks.Tests
 
                     Console.WriteLine($"Task: {x} ({queue.Count} tasks left)");
 
+                    var task = queue.GetCurrentTask();
+
+                    Console.WriteLine($"Task!!! {task.Tag}");
+
                     await Task.Delay(2000);
                 });
             }
@@ -255,7 +259,7 @@ namespace Sundstrom.Tasks.Tests
             .Start()
             .AwaitIsEmpty();
 
-            Console.WriteLine("foo");
+            queue.Stop();
         }
     }
 }

@@ -14,9 +14,7 @@ namespace Sundstrom.Tasks
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
 
-        private Queue<TaskInfo> queue = new Queue<TaskInfo>();
-
-        private SchedulerContext _context;
+        internal SchedulerContext _context;
         private bool _cancelOnException = true;
         private TimeSpan _delay;
 
@@ -124,20 +122,36 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Cancels the queue.
+        /// Stops the queue.
         /// </summary>
-        public TaskQueue Cancel()
+        public TaskQueue Stop()
         {
-            Scheduler.Cancel(_context);
+            Scheduler.Stop(_context);
+
+            _context = null;
+
             return this;
         }
 
         /// <summary>
-        /// Clear the queue.
+        /// Deschedule the task.
+         /// <param name="task"></param>
         /// </summary>
-        public void Clear()
+        public TaskQueue Deschedule(TaskInfo task)
+        {
+            Scheduler.Deschedule(_context, task);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Clear the queue and cancel all unexecuted tasks.
+        /// </summary>
+        public TaskQueue Clear()
         {
             Scheduler.Clear(_context);
+
+            return this;
         }
 
         public TimeSpan Delay
@@ -186,6 +200,11 @@ namespace Sundstrom.Tasks
         public event EventHandler<TaskEventArgs> TaskScheduled;
 
         /// <summary>
+        /// Raises when a task is canceling.
+        /// </summary>
+        public event EventHandler<TaskEventArgs> TaskCanceling;
+
+        /// <summary>
         /// Raises when a task is canceled.
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskCanceled;
@@ -229,7 +248,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return queue.Count;
+                return _context.Queue.Count;
             }
         }
 
@@ -240,7 +259,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return queue.Count == 0;
+                return _context.Queue.Count == 0;
             }
         }
 
@@ -325,6 +344,7 @@ namespace Sundstrom.Tasks
 
         private void SetContext()
         {
+            var queue = new Queue<TaskInfo>();
             _context = new SchedulerContext(queue, cts)
             {
                 Delay = Delay,

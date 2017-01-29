@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Sundstrom.Tasks;
+using Sundstrom.Tasks.Scheduling;
 
 namespace Sundstrom.Tasks
 {
@@ -76,6 +77,22 @@ namespace Sundstrom.Tasks
         {
             var taskInfo = new TaskInfo(source, async (q, ct) => await task);
             return source.Schedule(taskInfo);
+        }
+
+        /// <summary>
+        /// Cancel the task with the specified tag.
+        /// <param name="tag"></param>
+        /// </summary>
+        public static TaskQueue Deschedule(this TaskQueue source, string tag)
+        {
+            var context = source.GetContext();
+            var queue = context.Queue;
+            var item = queue.FirstOrDefault(x => x.Tag == tag);
+            if(item == null) 
+            {
+                throw new InvalidOperationException($"Task with tag \"{tag}\" does not exist.");
+            }
+            return source.Deschedule(item);
         }
 
         /// <summary>
