@@ -23,6 +23,7 @@ namespace Sundstrom.Tasks.Scheduling
             this.cts = cts;
             
             this.Queue = queue;
+            this.IsInvalid = false;
         }
 
         internal CancellationTokenSource CancellationTokenSource => cts;
@@ -34,6 +35,13 @@ namespace Sundstrom.Tasks.Scheduling
         public bool CancelOnException { get; internal set; }
 
         public Queue<TaskInfo> Queue { get; private set; }
+
+        internal bool IsInvalid { get; private set; }
+
+        internal void Invalidate() 
+        {
+            IsInvalid = true;
+        }
 
         public void Remove(TaskInfo task) 
         {

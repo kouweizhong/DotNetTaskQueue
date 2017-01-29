@@ -199,7 +199,7 @@ namespace Sundstrom.Tasks.Tests
 
                 taskExecutedCount++;
             });
-            
+
             await queue.AwaitIsEmpty();
 
             Assert.Equal(3, taskExecutedCount);
@@ -249,17 +249,43 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Run2()
         {
+            Console.WriteLine(nameof(Run2));
+
             var queue = TaskQueue.Create("7");
 
             queue.CancelOnException = true;
-
-            await queue.Schedule((context, ct) => {
+            
+            await queue.Schedule((context, ct) =>
+            {
                 Console.WriteLine("Hello World!");
             })
             .Start()
             .AwaitIsEmpty();
+        }
 
-            queue.Stop();
+        [Fact]
+        public async Task Run3()
+        {
+            Console.WriteLine(nameof(Run3));
+
+            var queue = TaskQueue.Create("8");
+
+            queue.CancelOnException = true;
+
+            await queue.Schedule((context, ct) =>
+            {
+                Console.WriteLine("Task 1");
+            }).Schedule((context, ct) =>
+            {
+                queue.Stop();
+
+                Console.WriteLine("Task 2");
+            }).Schedule((context, ct) =>
+            {
+                Console.WriteLine("Task 3");
+            })
+            .Start()
+            .AwaitIsStopped();
         }
     }
 }

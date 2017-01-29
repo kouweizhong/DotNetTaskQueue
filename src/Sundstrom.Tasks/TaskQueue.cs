@@ -12,8 +12,6 @@ namespace Sundstrom.Tasks
     /// </summary>
     public class TaskQueue
     {
-        private CancellationTokenSource cts = new CancellationTokenSource();
-
         internal SchedulerContext _context;
         private bool _cancelOnException = true;
         private TimeSpan _delay;
@@ -99,7 +97,7 @@ namespace Sundstrom.Tasks
         /// <returns>The start.</returns>
         public TaskQueue Start()
         {
-            SetContext();
+            EnsureContextIsCreated();
 
             Scheduler.Start(_context);
             return this;
@@ -112,10 +110,7 @@ namespace Sundstrom.Tasks
         /// <param name="task">Task.</param>
         public TaskQueue Schedule(TaskInfo task)
         {
-            if(_context == null)
-            {
-                SetContext();
-            }
+            EnsureContextIsCreated();
 
             Scheduler.Schedule(_context, task);
             return this;
@@ -126,16 +121,16 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue Stop()
         {
-            Scheduler.Stop(_context);
+            _context.Invalidate();
 
-            _context = null;
+            Scheduler.Stop(_context);
 
             return this;
         }
 
         /// <summary>
         /// Deschedule the task.
-         /// <param name="task"></param>
+        /// <param name="task"></param>
         /// </summary>
         public TaskQueue Deschedule(TaskInfo task)
         {
@@ -342,9 +337,30 @@ namespace Sundstrom.Tasks
 
         #region Internals
 
-        private void SetContext()
+        private void EnsureContextIsCreated()
         {
-            var queue = new Queue<TaskInfo>();
+            if (_context == null || _context.IsInvalid)
+            {
+                CreateContext();
+            }
+        }
+
+        private void CreateContext()
+        {
+            var cts = new CancellationTokenSource();
+
+            Queue<TaskInfo> queue;
+
+            if(_context != null)
+            {
+                // Restore existing queue context.
+
+                queue = _context.Queue;
+            } 
+            else 
+            {
+                queue = new Queue<TaskInfo>();
+            }
             _context = new SchedulerContext(queue, cts)
             {
                 Delay = Delay,

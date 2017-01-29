@@ -85,7 +85,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public static TaskQueue Deschedule(this TaskQueue source, string tag)
         {
-            var context = source.GetContext();
+            var context = source.GetSchedulerContext();
             var queue = context.Queue;
             var item = queue.FirstOrDefault(x => x.Tag == tag);
             if(item == null) 
@@ -114,5 +114,22 @@ namespace Sundstrom.Tasks
             });
         }
 
+        /// <summary>
+        /// Waits for the queue to be stopped.
+        /// </summary>
+        /// <param name="checkRate"></param>
+        /// <returns>The current queue.</returns>
+        public static Task<TaskQueue> AwaitIsStopped(this TaskQueue source, int checkRate = 200)
+        {
+            return Task.Run(async () =>
+            {
+                while (source.IsStarted)
+                {
+                    await Task.Delay(checkRate);
+                }
+
+                return source;
+            });
+        }
     }
 }
