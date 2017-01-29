@@ -14,9 +14,9 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Synchronous()
         {
-            var queue = TaskQueue.Create("1").Start();
+            Console.WriteLine(nameof(Synchronous));
 
-            Console.WriteLine("SYNCHRONOUS");
+            var queue = TaskQueue.Create("1").Start();
 
             int taskExecutedCount = 0;
 
@@ -43,9 +43,9 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Asynchronous()
         {
-            var queue = TaskQueue.Create("2").Start();
+            Console.WriteLine(nameof(Asynchronous));
 
-            Console.WriteLine("ASYNCHRONOUS");
+            var queue = TaskQueue.Create("2").Start();
 
             int taskExecutedCount = 0;
 
@@ -78,9 +78,9 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Combo()
         {
-            var queue = TaskQueue.Create("3").Start();
+            Console.WriteLine(nameof(Combo));
 
-            Console.WriteLine("COMBO");
+            var queue = TaskQueue.Create("3").Start();
 
             int taskExecutedCount = 0;
 
@@ -111,7 +111,7 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Exception_EventHandler()
         {
-            Console.WriteLine("EXCEPTION");
+            Console.WriteLine(nameof(Exception_EventHandler));
 
             string tag = null;
             int taskExecutedCount = 0;
@@ -158,7 +158,7 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Exception_EventHandler_CancelOverride()
         {
-            Console.WriteLine("EXCEPTION");
+            Console.WriteLine(nameof(Exception_EventHandler_CancelOverride));
 
             string tag = null;
             int taskExecutedCount = 0;
@@ -177,7 +177,7 @@ namespace Sundstrom.Tasks.Tests
                 args.Cancel = false;
             };
 
-            await queue.Schedule("Task 1", async (context, ct) =>
+            queue.Schedule("Task 1", async (context, ct) =>
             {
                 Console.WriteLine("Item 1: Async");
 
@@ -198,7 +198,9 @@ namespace Sundstrom.Tasks.Tests
                 await Task.Delay(2000);
 
                 taskExecutedCount++;
-            }).AwaitIsEmpty();
+            });
+            
+            await queue.AwaitIsEmpty();
 
             Assert.Equal(3, taskExecutedCount);
             Assert.Equal("Task 2", tag);
@@ -207,6 +209,8 @@ namespace Sundstrom.Tasks.Tests
         [Fact]
         public async Task Run()
         {
+            Console.WriteLine(nameof(Run));
+
             var queue = TaskQueue.Create("6");
 
             queue.CancelOnException = true;
@@ -219,12 +223,12 @@ namespace Sundstrom.Tasks.Tests
                 e.Cancel = false;
             };
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 1; i <= 5; i++)
             {
                 int x = i;
                 queue.Schedule($"Task: {x}", async (context, ct) =>
                 {
-                    if (x == 8)
+                    if (x == 2)
                     {
                         throw new Exception();
                     }
@@ -236,8 +240,6 @@ namespace Sundstrom.Tasks.Tests
             }
 
             await queue.AwaitIsEmpty();
-
-            Console.WriteLine($"End");
         }
 
         [Fact]
@@ -247,11 +249,13 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
-            await queue.Schedule(async (context, ct) => {
+            await queue.Schedule((context, ct) => {
                 Console.WriteLine("Hello World!");
             })
             .Start()
             .AwaitIsEmpty();
+
+            Console.WriteLine("foo");
         }
     }
 }

@@ -114,6 +114,11 @@ namespace Sundstrom.Tasks
         /// <param name="task">Task.</param>
         public TaskQueue Schedule(TaskInfo task)
         {
+            if(_context == null)
+            {
+                SetContext();
+            }
+
             Scheduler.Schedule(_context, task);
             return this;
         }
@@ -235,7 +240,7 @@ namespace Sundstrom.Tasks
         {
             get
             {
-                return queue.Count > 0;
+                return queue.Count == 0;
             }
         }
 
