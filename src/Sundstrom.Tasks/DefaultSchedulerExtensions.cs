@@ -98,50 +98,41 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Waits for the queue to be empty.
         /// </summary>
-        /// <param name="checkRate"></param>
-        /// <param name="value"></param>
         /// <returns>The current queue.</returns>
-        public static Task<TaskQueue> AwaitIsEmpty(this TaskQueue source, int checkRate = 200, bool value = true)
+        public static async Task<TaskQueue> AwaitIsEmpty(this TaskQueue source)
         {
-            return Task.Run(async () =>
+            if(source.IsEmpty) 
             {
-                while (source.IsEmpty != value)
-                {
-                    await Task.Delay(checkRate);
-                }
-
                 return source;
-            });
+            }
+            EventHandler<QueueEventArgs> handler = null;
+            var tcs = new TaskCompletionSource<TaskQueue>();
+            handler = (s, e) => {
+                source.Empty -= handler;
+                tcs.SetResult(source);
+            };
+            source.Empty += handler;
+            return await tcs.Task;
         }
 
         /// <summary>
         /// Waits for the queue to be stopped.
         /// </summary>
         /// <returns>The current queue.</returns>
-        public static Task<TaskQueue> AwaitIsStopped(this TaskQueue source, int checkRate = 200)
+        public static async Task<TaskQueue> AwaitIsStopped(this TaskQueue source)
         {
-            return Task.Run(async () =>
+            if(source.IsStopped) 
             {
-                while (!source.IsStopped)
-                {
-                    await Task.Delay(checkRate);
-                }
-
                 return source;
-            });
-
-            /*
-            // NOT WORKING //
-
+            }
             EventHandler<QueueEventArgs> handler = null;
             var tcs = new TaskCompletionSource<TaskQueue>();
             handler = (s, e) => {
-                // source.Stopped -= handler;
+                source.Stopped -= handler;
                 tcs.SetResult(source);
             };
             source.Stopped += handler;
-            return tcs.Task;
-            */
+            return await tcs.Task;
         }
     }
 }

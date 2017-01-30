@@ -305,6 +305,10 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
+            queue.Empty += (s, e) => {
+                Console.WriteLine("Empty");
+            };
+
             await queue.Schedule("Task 1", (context, ct) =>
             {
                 Console.WriteLine("Task 1");

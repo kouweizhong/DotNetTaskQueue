@@ -185,6 +185,11 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
+        /// Occurs when the queue is empty.
+        /// </summary>
+        public event EventHandler<QueueEventArgs> Empty;
+
+        /// <summary>
         /// Occurs when the queue is started.
         /// </summary>
         public event EventHandler<QueueEventArgs> Started;
@@ -387,6 +392,8 @@ namespace Sundstrom.Tasks
                 Delay = Delay,
                 CancelOnException = CancelOnException,
 
+                _queueEmpty = RaiseQueueEmpty,
+
                 _queueStarted = RaiseQueueStarted,
                 _queueStopped = RaiseQueueStopped,
 
@@ -396,6 +403,11 @@ namespace Sundstrom.Tasks
                 _taskExecuted = RaiseTaskExecuted,
                 _taskException = RaiseTaskException,
             };
+        }
+
+        private void RaiseQueueEmpty(QueueEventArgs e)
+        {
+            Empty?.Invoke(this, e);
         }
 
         private void RaiseQueueStarted(QueueEventArgs e)

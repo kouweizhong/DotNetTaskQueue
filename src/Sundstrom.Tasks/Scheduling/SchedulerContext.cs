@@ -11,6 +11,7 @@ namespace Sundstrom.Tasks.Scheduling
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
 
+        internal Action<QueueEventArgs> _queueEmpty;
         internal Action<QueueEventArgs> _queueStarted;
         internal Action<QueueEventArgs> _queueStopped;
 
@@ -49,6 +50,11 @@ namespace Sundstrom.Tasks.Scheduling
         public void Remove(TaskInfo task)
         {
             Queue = new Queue<TaskInfo>(Queue.Where(x => x != task));
+        }
+
+        public void RaiseQueueEmpty(QueueEventArgs e)
+        {
+            this._queueEmpty(e);
         }
 
         public void RaiseQueueStarted(QueueEventArgs e)

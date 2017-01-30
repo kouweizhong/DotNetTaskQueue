@@ -125,6 +125,10 @@ namespace Sundstrom.Tasks.Scheduling
                     _isBusy = false;
                     await Next(context);
                 }
+                else 
+                {
+                    context.RaiseQueueEmpty(new QueueEventArgs());
+                }
             }
             else
             {
