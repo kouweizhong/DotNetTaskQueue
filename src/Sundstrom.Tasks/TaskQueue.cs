@@ -185,6 +185,16 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
+        /// Raises when the queue is started.
+        /// </summary>
+        public event EventHandler<QueueEventArgs> Started;
+
+        /// <summary>
+        /// Raises when the queue is stopped.
+        /// </summary>
+        public event EventHandler<QueueEventArgs> Stopped;
+
+        /// <summary>
         /// Raises when an exception is thrown in a executed task.
         /// </summary>
         public event EventHandler<TaskExceptionEventArgs> TaskException;
@@ -366,12 +376,25 @@ namespace Sundstrom.Tasks
                 Delay = Delay,
                 CancelOnException = CancelOnException,
 
+                _queueStarted = RaiseQueueStarted,
+                _queueStopped = RaiseQueueStopped,
+
                 _taskScheduled = RaiseTaskScheduled,
                 _taskCanceled = RaiseTaskCanceled,
                 _taskExecuting = RaiseTaskExecuting,
                 _taskExecuted = RaiseTaskExecuted,
                 _taskException = RaiseTaskException,
             };
+        }
+
+        private void RaiseQueueStarted(QueueEventArgs e)
+        {
+            Started?.Invoke(this, e);
+        }
+
+         private void RaiseQueueStopped(QueueEventArgs e)
+        {
+            Stopped?.Invoke(this, e);
         }
 
         private void RaiseTaskScheduled(TaskEventArgs e)

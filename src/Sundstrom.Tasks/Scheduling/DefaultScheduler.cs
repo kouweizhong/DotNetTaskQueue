@@ -142,6 +142,8 @@ namespace Sundstrom.Tasks.Scheduling
             _isStarted = false;
             _isRunning = false;
             _isBusy = false;
+
+            context.RaiseQueueStopped(new QueueEventArgs());
         }
 
         public override void Deschedule(SchedulerContext context, TaskInfo task)
@@ -189,6 +191,8 @@ namespace Sundstrom.Tasks.Scheduling
             _isStarted = true;
 
             Next(context);
+
+            context.RaiseQueueStarted(new QueueEventArgs());
         }
     }
 }

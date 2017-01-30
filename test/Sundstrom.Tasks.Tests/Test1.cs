@@ -272,6 +272,14 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
+            queue.Started += (s, e) => {
+                Console.WriteLine("Started");
+            };
+
+            queue.Stopped += (s, e) => {
+                Console.WriteLine("Stopped");
+            };
+
             await queue.Schedule((context, ct) =>
             {
                 Console.WriteLine("Task 1");
@@ -286,6 +294,29 @@ namespace Sundstrom.Tasks.Tests
             })
             .Start()
             .AwaitIsStopped();
+        }
+
+        [Fact]
+        public async Task Run4()
+        {
+            Console.WriteLine(nameof(Run4));
+
+            var queue = TaskQueue.Create("9");
+
+            queue.CancelOnException = true;
+
+            await queue.Schedule("Task 1", (context, ct) =>
+            {
+                Console.WriteLine("Task 1");
+            }).Schedule("Task 2", (context, ct) =>
+            {
+                Console.WriteLine("Task 2");
+            }).Schedule("Task 3", (context, ct) =>
+            {
+                Console.WriteLine("Task 3");
+            })
+            .Start()
+            .AwaitIsEmpty();
         }
     }
 }

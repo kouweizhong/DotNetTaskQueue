@@ -117,11 +117,10 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Waits for the queue to be stopped.
         /// </summary>
-        /// <param name="checkRate"></param>
         /// <returns>The current queue.</returns>
         public static Task<TaskQueue> AwaitIsStopped(this TaskQueue source, int checkRate = 200)
         {
-            return Task.Run(async () =>
+             return Task.Run(async () =>
             {
                 while (source.IsStarted)
                 {
@@ -130,6 +129,19 @@ namespace Sundstrom.Tasks
 
                 return source;
             });
+
+            /*
+            // NOT WORKING //
+
+            EventHandler<QueueEventArgs> handler = null;
+            var tcs = new TaskCompletionSource<TaskQueue>();
+            handler = (s, e) => {
+                // source.Stopped -= handler;
+                tcs.SetResult(source);
+            };
+            source.Stopped += handler;
+            return tcs.Task;
+            */
         }
     }
 }
