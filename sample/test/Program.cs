@@ -15,28 +15,32 @@ class Program
 
         queue.CancelOnException = true;
 
-        queue.Empty += (s, e) => {
-            Console.WriteLine("Empty");
+        queue.TaskExecuted += (s, e) => {
+            Console.WriteLine($"Task {e.Tag} was executed.");
         };
 
-        await queue.Schedule("Task 1", async (context, ct) =>
+        queue.Empty += (s, e) => {
+            Console.WriteLine("The queue is empty.");
+        };
+
+        queue.Start();
+
+        int id = 1;
+
+        while(true) 
         {
-            Console.WriteLine("Task 1");
+            Console.Read();
 
-            await Task.Delay(2000);
+            var id2 = id;
 
-        }).Schedule("Task 2", async (context, ct) =>
-        {
-            Console.WriteLine("Task 2");
+            queue.Schedule($"Task {id2}", async (context, ct) =>
+            {
+                await Task.Delay(2000);
+            });
 
-            await Task.Delay(2000);
-        }).Schedule("Task 3", async (context, ct) =>
-        {
-            Console.WriteLine("Task 3");
+            Console.WriteLine($"Task {id2} was added to queue.");
 
-            await Task.Delay(2000);
-        })
-        .Start()
-        .AwaitIsEmpty();
+            id++;
+        }
     } 
 }
