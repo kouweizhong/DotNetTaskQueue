@@ -15,6 +15,14 @@ class Program
 
         queue.CancelOnException = true;
 
+        queue.TaskScheduled += (s, e) => {
+            Console.WriteLine($"Task {e.Tag} was scheduled.");
+        };
+
+        queue.TaskCanceled += (s, e) => {
+            Console.WriteLine($"Task {e.Tag} was canceled.");
+        };
+
         queue.TaskExecuted += (s, e) => {
             Console.WriteLine($"Task {e.Tag} was executed.");
         };
@@ -29,18 +37,19 @@ class Program
 
         while(true) 
         {
-            Console.Read();
+            var key = Console.Read();
 
-            var id2 = id;
+            var k = key;
+            if(k == 'q')
+            {
+                // Deschedule next
+                queue.Deschedule($"Task {id - 1}");
+            }
 
-            queue.Schedule($"Task {id2}", async (context, ct) =>
+            queue.Schedule($"Task {id++}", async (context, ct) =>
             {
                 await Task.Delay(2000);
             });
-
-            Console.WriteLine($"Task {id2} was added to queue.");
-
-            id++;
         }
     } 
 }
