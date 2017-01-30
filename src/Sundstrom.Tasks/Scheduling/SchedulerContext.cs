@@ -24,7 +24,7 @@ namespace Sundstrom.Tasks.Scheduling
         public SchedulerContext(Queue<TaskInfo> queue, CancellationTokenSource cts)
         {
             this.cts = cts;
-            
+
             this.Queue = queue;
             this.IsInvalid = false;
         }
@@ -41,12 +41,12 @@ namespace Sundstrom.Tasks.Scheduling
 
         internal bool IsInvalid { get; private set; }
 
-        internal void Invalidate() 
+        internal void Invalidate()
         {
             IsInvalid = true;
         }
 
-        public void Remove(TaskInfo task) 
+        public void Remove(TaskInfo task)
         {
             Queue = new Queue<TaskInfo>(Queue.Where(x => x != task));
         }

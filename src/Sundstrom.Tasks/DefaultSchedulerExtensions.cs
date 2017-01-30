@@ -88,7 +88,7 @@ namespace Sundstrom.Tasks
             var context = source.GetSchedulerContext();
             var queue = context.Queue;
             var item = queue.FirstOrDefault(x => x.Tag == tag);
-            if(item == null) 
+            if (item == null)
             {
                 throw new InvalidOperationException($"Task with tag \"{tag}\" does not exist.");
             }
@@ -120,9 +120,9 @@ namespace Sundstrom.Tasks
         /// <returns>The current queue.</returns>
         public static Task<TaskQueue> AwaitIsStopped(this TaskQueue source, int checkRate = 200)
         {
-             return Task.Run(async () =>
+            return Task.Run(async () =>
             {
-                while (source.IsStarted)
+                while (!source.IsStopped)
                 {
                     await Task.Delay(checkRate);
                 }

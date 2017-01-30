@@ -236,6 +236,17 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
+        /// Gets a value that indicates whether this queue has been stopped or not.
+        /// </summary>
+        public bool IsStopped
+        {
+            get
+            {
+                return Scheduler.IsStopped;
+            }
+        }
+
+        /// <summary>
         /// Gets a value that indicates whether this queue is running or not.
         /// </summary>
         public bool IsRunning
@@ -361,13 +372,13 @@ namespace Sundstrom.Tasks
 
             Queue<TaskInfo> queue;
 
-            if(_context != null)
+            if (_context != null)
             {
                 // Restore existing queue context.
 
                 queue = _context.Queue;
-            } 
-            else 
+            }
+            else
             {
                 queue = new Queue<TaskInfo>();
             }
@@ -392,7 +403,7 @@ namespace Sundstrom.Tasks
             Started?.Invoke(this, e);
         }
 
-         private void RaiseQueueStopped(QueueEventArgs e)
+        private void RaiseQueueStopped(QueueEventArgs e)
         {
             Stopped?.Invoke(this, e);
         }

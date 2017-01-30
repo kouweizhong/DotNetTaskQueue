@@ -9,12 +9,14 @@ namespace Sundstrom.Tasks.Scheduling
 {
     public sealed class DefaultScheduler : Scheduler
     {
-        public DefaultScheduler() 
+        public DefaultScheduler()
         {
 
         }
 
         private bool _isStarted;
+
+        private bool _isStopped;
 
         private bool _isRunning;
 
@@ -35,6 +37,14 @@ namespace Sundstrom.Tasks.Scheduling
             get
             {
                 return _isRunning;
+            }
+        }
+
+        public override bool IsStopped
+        {
+            get
+            {
+                return _isStopped;
             }
         }
 
@@ -140,6 +150,7 @@ namespace Sundstrom.Tasks.Scheduling
             context.CancellationTokenSource.Cancel();
 
             _isStarted = false;
+            _isStopped = true;
             _isRunning = false;
             _isBusy = false;
 
@@ -149,14 +160,14 @@ namespace Sundstrom.Tasks.Scheduling
         public override void Deschedule(SchedulerContext context, TaskInfo task)
         {
             var item = context.Queue.FirstOrDefault(x => x == task);
-            if(item == null) 
+            if (item == null)
             {
                 throw new InvalidOperationException("Not part of this queue.");
             }
 
             var e = new TaskCancelingEventArgs(task.Tag, true);
             context.RaiseTaskCanceling(e);
-            if(e.Cancel) 
+            if (e.Cancel)
             {
                 context.Remove(item);
 
@@ -189,6 +200,7 @@ namespace Sundstrom.Tasks.Scheduling
                 throw new InvalidCastException("Queue has already been started.");
             }
             _isStarted = true;
+            _isStopped = false;
 
             Next(context);
 

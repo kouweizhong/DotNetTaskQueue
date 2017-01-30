@@ -25,6 +25,8 @@ namespace Sundstrom.Tasks.Scheduling
 
         public abstract bool IsRunning { get; }
 
+        public abstract bool IsStopped { get; }
+
         public abstract TaskInfo Current { get; }
     }
 }
