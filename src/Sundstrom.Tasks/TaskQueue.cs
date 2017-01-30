@@ -212,7 +212,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Occurs when a task is canceling.
         /// </summary>
-        public event EventHandler<TaskEventArgs> TaskCanceling;
+        public event EventHandler<TaskCancelingEventArgs> TaskCanceling;
 
         /// <summary>
         /// Occurs when a task is canceled.
@@ -399,6 +399,7 @@ namespace Sundstrom.Tasks
 
                 _taskScheduled = RaiseTaskScheduled,
                 _taskCanceled = RaiseTaskCanceled,
+                _taskCanceling = RaiseTaskCanceling,
                 _taskExecuting = RaiseTaskExecuting,
                 _taskExecuted = RaiseTaskExecuted,
                 _taskException = RaiseTaskException,
@@ -428,6 +429,11 @@ namespace Sundstrom.Tasks
         private void RaiseTaskCanceled(TaskEventArgs e)
         {
             TaskCanceled?.Invoke(this, e);
+        }
+
+        private void RaiseTaskCanceling(TaskCancelingEventArgs e)
+        {
+            TaskCanceling?.Invoke(this, e);
         }
 
         private void RaiseTaskExecuting(TaskEventArgs e)
