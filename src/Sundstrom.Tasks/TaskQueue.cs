@@ -185,42 +185,42 @@ namespace Sundstrom.Tasks
         }
 
         /// <summary>
-        /// Raises when the queue is started.
+        /// Occurs when the queue is started.
         /// </summary>
         public event EventHandler<QueueEventArgs> Started;
 
         /// <summary>
-        /// Raises when the queue is stopped.
+        /// Occurs when the queue is stopped.
         /// </summary>
         public event EventHandler<QueueEventArgs> Stopped;
 
         /// <summary>
-        /// Raises when an exception is thrown in a executed task.
+        /// Occurs when an exception is thrown in a executed task.
         /// </summary>
         public event EventHandler<TaskExceptionEventArgs> TaskException;
 
         /// <summary>
-        /// Raises when a task is scheduled.
+        /// Occurs when a task is scheduled.
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskScheduled;
 
         /// <summary>
-        /// Raises when a task is canceling.
+        /// Occurs when a task is canceling.
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskCanceling;
 
         /// <summary>
-        /// Raises when a task is canceled.
+        /// Occurs when a task is canceled.
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskCanceled;
 
         /// <summary>
-        /// Raises when a task is about to be executed.
+        /// Occurs when a task is about to be executed.
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskExecuting;
 
         /// <summary>
-        /// Raises when a task is has been executed.
+        /// Occurs when a task is has been executed.
         /// </summary>
         public event EventHandler<TaskEventArgs> TaskExecuted;
 
