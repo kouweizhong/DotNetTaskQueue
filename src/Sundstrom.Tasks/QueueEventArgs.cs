@@ -9,7 +9,6 @@ namespace Sundstrom.Tasks
     {
         internal QueueEventArgs()
         {
-
         }
     }
 }

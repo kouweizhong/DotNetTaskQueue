@@ -152,10 +152,7 @@ namespace Sundstrom.Tasks
 
         public TimeSpan Delay
         {
-            get
-            {
-                return _delay;
-            }
+            get => _delay;
             set
             {
                 if (Scheduler.IsStarted)
@@ -171,10 +168,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public bool CancelOnException
         {
-            get
-            {
-                return _cancelOnException;
-            }
+            get => _cancelOnException;
             set
             {
                 if (Scheduler.IsStarted)
@@ -233,57 +227,27 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets a value that indicates whether this queue is started or not.
         /// </summary>
-        public bool IsStarted
-        {
-            get
-            {
-                return Scheduler.IsStarted;
-            }
-        }
+        public bool IsStarted => Scheduler.IsStarted;
 
         /// <summary>
         /// Gets a value that indicates whether this queue has been stopped or not.
         /// </summary>
-        public bool IsStopped
-        {
-            get
-            {
-                return Scheduler.IsStopped;
-            }
-        }
+        public bool IsStopped => Scheduler.IsStopped;
 
         /// <summary>
         /// Gets a value that indicates whether this queue is running or not.
         /// </summary>
-        public bool IsRunning
-        {
-            get
-            {
-                return Scheduler.IsRunning;
-            }
-        }
+        public bool IsRunning => Scheduler.IsRunning;
 
         /// <summary>
         /// Gets the number of tasks currently in the queue.
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return _context.Queue.Count;
-            }
-        }
+        public int Count => _context.Queue.Count;
 
         /// <summary>
         /// Gets a value that indicates whether this queue is empty of not.
         /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return _context.Queue.Count == 0;
-            }
-        }
+        public bool IsEmpty => _context.Queue.Count == 0;
 
         /// <summary>
         /// Gets the default queue.
@@ -294,7 +258,7 @@ namespace Sundstrom.Tasks
             {
                 if (_default == null)
                 {
-                    lock(syncRoot) 
+                    lock(syncRoot)
                     {
                         _default = new TaskQueue(string.Empty, null);
                         _queues[string.Empty] = _default;
@@ -309,13 +273,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets the existing queues.
         /// </summary>
-        public static IEnumerable<TaskQueue> Queues
-        {
-            get
-            {
-                return _queues.Select(x => x.Value);
-            }
-        }
+        public static IEnumerable<TaskQueue> Queues => _queues.Select(x => x.Value).ToArray();
 
         /// <summary>
         /// Creates a queue.
@@ -323,10 +281,7 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static TaskQueue Create(string tag, object data = null)
-        {
-            return Create(new DefaultScheduler(), tag, data);
-        }
+        public static TaskQueue Create(string tag, object data = null) => Create(new DefaultScheduler(), tag, data);
 
         /// <summary>
         /// Creates a queue with a specified Scheduler.
@@ -360,10 +315,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="queue"></param>
         /// <returns></returns>
-        public static bool Remove(TaskQueue queue)
-        {
-            return _queues.Remove(queue.Tag);
-        }
+        public static bool Remove(TaskQueue queue) => _queues.Remove(queue.Tag);
 
         #region Internals
 
@@ -410,50 +362,23 @@ namespace Sundstrom.Tasks
             };
         }
 
-        private void RaiseQueueEmpty(QueueEventArgs e)
-        {
-            Empty?.Invoke(this, e);
-        }
+        private void RaiseQueueEmpty(QueueEventArgs e) => Empty?.Invoke(this, e);
 
-        private void RaiseQueueStarted(QueueEventArgs e)
-        {
-            Started?.Invoke(this, e);
-        }
+        private void RaiseQueueStarted(QueueEventArgs e) => Started?.Invoke(this, e);
 
-        private void RaiseQueueStopped(QueueEventArgs e)
-        {
-            Stopped?.Invoke(this, e);
-        }
+        private void RaiseQueueStopped(QueueEventArgs e) => Stopped?.Invoke(this, e);
 
-        private void RaiseTaskScheduled(TaskEventArgs e)
-        {
-            TaskScheduled?.Invoke(this, e);
-        }
+        private void RaiseTaskScheduled(TaskEventArgs e) => TaskScheduled?.Invoke(this, e);
 
-        private void RaiseTaskCanceled(TaskEventArgs e)
-        {
-            TaskCanceled?.Invoke(this, e);
-        }
+        private void RaiseTaskCanceled(TaskEventArgs e) => TaskCanceled?.Invoke(this, e);
 
-        private void RaiseTaskCanceling(TaskCancelingEventArgs e)
-        {
-            TaskCanceling?.Invoke(this, e);
-        }
+        private void RaiseTaskCanceling(TaskCancelingEventArgs e) => TaskCanceling?.Invoke(this, e);
 
-        private void RaiseTaskExecuting(TaskEventArgs e)
-        {
-            TaskExecuting?.Invoke(this, e);
-        }
+        private void RaiseTaskExecuting(TaskEventArgs e) => TaskExecuting?.Invoke(this, e);
 
-        private void RaiseTaskExecuted(TaskEventArgs e)
-        {
-            TaskExecuted?.Invoke(this, e);
-        }
+        private void RaiseTaskExecuted(TaskEventArgs e) => TaskExecuted?.Invoke(this, e);
 
-        private void RaiseTaskException(TaskExceptionEventArgs e)
-        {
-            TaskException?.Invoke(this, e);
-        }
+        private void RaiseTaskException(TaskExceptionEventArgs e) => TaskException?.Invoke(this, e);
 
         #endregion
     }

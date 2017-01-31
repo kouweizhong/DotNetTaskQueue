@@ -101,7 +101,7 @@ namespace Sundstrom.Tasks
         /// <returns>The current queue.</returns>
         public static async Task<TaskQueue> AwaitIsEmpty(this TaskQueue source)
         {
-            if(source.IsEmpty) 
+            if(source.IsEmpty)
             {
                 return source;
             }
@@ -121,7 +121,7 @@ namespace Sundstrom.Tasks
         /// <returns>The current queue.</returns>
         public static async Task<TaskQueue> AwaitIsStopped(this TaskQueue source)
         {
-            if(source.IsStopped) 
+            if(source.IsStopped)
             {
                 return source;
             }

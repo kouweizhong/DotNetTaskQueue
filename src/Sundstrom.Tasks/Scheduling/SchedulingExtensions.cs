@@ -14,14 +14,8 @@ namespace Sundstrom.Tasks.Scheduling
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static SchedulerContext GetSchedulerContext(this TaskQueue source)
-        {
-            return source._context;
-        }
+        public static SchedulerContext GetSchedulerContext(this TaskQueue source) => source._context;
 
-        public static TaskInfo GetCurrentTask(this TaskQueue source)
-        {
-            return source.Scheduler.Current;
-        }
+        public static TaskInfo GetCurrentTask(this TaskQueue source) => source.Scheduler.Current;
     }
 }

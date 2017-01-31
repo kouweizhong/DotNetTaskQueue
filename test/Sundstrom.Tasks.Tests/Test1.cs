@@ -254,11 +254,9 @@ namespace Sundstrom.Tasks.Tests
             var queue = TaskQueue.Create("7");
 
             queue.CancelOnException = true;
-            
-            await queue.Schedule((context, ct) =>
-            {
-                Console.WriteLine("Hello World!");
-            })
+
+            await queue
+            .Schedule((context, ct) => Console.WriteLine("Hello World!"))
             .Start()
             .AwaitIsEmpty();
         }
@@ -272,26 +270,17 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
-            queue.Started += (s, e) => {
-                Console.WriteLine("Started");
-            };
+            queue.Started += (s, e) => Console.WriteLine("Started");
 
-            queue.Stopped += (s, e) => {
-                Console.WriteLine("Stopped");
-            };
+            queue.Stopped += (s, e) => Console.WriteLine("Stopped");
 
-            await queue.Schedule((context, ct) =>
-            {
-                Console.WriteLine("Task 1");
-            }).Schedule((context, ct) =>
+            await queue.Schedule((context, ct) => Console.WriteLine("Task 1")).Schedule((context, ct) =>
             {
                 queue.Stop();
 
                 Console.WriteLine("Task 2");
-            }).Schedule((context, ct) =>
-            {
-                Console.WriteLine("Task 3");
             })
+            .Schedule((context, ct) => Console.WriteLine("Task 3"))
             .Start()
             .AwaitIsStopped();
         }
@@ -305,22 +294,14 @@ namespace Sundstrom.Tasks.Tests
 
             queue.CancelOnException = true;
 
-            queue.Empty += (s, e) => {
-                Console.WriteLine("Empty");
-            };
+            queue.Empty += (s, e) => Console.WriteLine("Empty");
 
-            await queue.Schedule("Task 1", (context, ct) =>
-            {
-                Console.WriteLine("Task 1");
-            }).Schedule("Task 2", (context, ct) =>
-            {
-                Console.WriteLine("Task 2");
-            }).Schedule("Task 3", (context, ct) =>
-            {
-                Console.WriteLine("Task 3");
-            })
-            .Start()
-            .AwaitIsEmpty();
+            await queue
+                .Schedule("Task 1", (context, ct) => Console.WriteLine("Task 1"))
+                .Schedule("Task 2", (context, ct) => Console.WriteLine("Task 2"))
+                .Schedule("Task 3", (context, ct) => Console.WriteLine("Task 3"))
+                .Start()
+                .AwaitIsEmpty();
         }
     }
 }

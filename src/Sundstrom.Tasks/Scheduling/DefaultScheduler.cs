@@ -11,7 +11,6 @@ namespace Sundstrom.Tasks.Scheduling
     {
         public DefaultScheduler()
         {
-
         }
 
         private bool _isStarted;
@@ -24,37 +23,13 @@ namespace Sundstrom.Tasks.Scheduling
 
         private TaskInfo _current;
 
-        public override bool IsStarted
-        {
-            get
-            {
-                return _isStarted;
-            }
-        }
+        public override bool IsStarted => _isStarted;
 
-        public override bool IsRunning
-        {
-            get
-            {
-                return _isRunning;
-            }
-        }
+        public override bool IsRunning => _isRunning;
 
-        public override bool IsStopped
-        {
-            get
-            {
-                return _isStopped;
-            }
-        }
+        public override bool IsStopped => _isStopped;
 
-        public override TaskInfo Current
-        {
-            get
-            {
-                return _current;
-            }
-        }
+        public override TaskInfo Current => _current;
 
         public override async Task Next(SchedulerContext context)
         {
@@ -123,7 +98,7 @@ namespace Sundstrom.Tasks.Scheduling
                     _isBusy = false;
                     await Next(context);
                 }
-                else 
+                else
                 {
                     context.RaiseQueueEmpty(new QueueEventArgs());
                 }

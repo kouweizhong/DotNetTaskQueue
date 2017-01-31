@@ -42,59 +42,26 @@ namespace Sundstrom.Tasks.Scheduling
 
         internal bool IsInvalid { get; private set; }
 
-        internal void Invalidate()
-        {
-            IsInvalid = true;
-        }
+        internal void Invalidate() => IsInvalid = true;
 
-        public void Remove(TaskInfo task)
-        {
-            Queue = new Queue<TaskInfo>(Queue.Where(x => x != task));
-        }
+        public void Remove(TaskInfo task) => Queue = new Queue<TaskInfo>(Queue.Where(x => x != task));
 
-        public void RaiseQueueEmpty(QueueEventArgs e)
-        {
-            this._queueEmpty(e);
-        }
+        public void RaiseQueueEmpty(QueueEventArgs e) => this._queueEmpty(e);
 
-        public void RaiseQueueStarted(QueueEventArgs e)
-        {
-            this._queueStarted(e);
-        }
+        public void RaiseQueueStarted(QueueEventArgs e) => this._queueStarted(e);
 
-        public void RaiseQueueStopped(QueueEventArgs e)
-        {
-            this._queueStopped(e);
-        }
+        public void RaiseQueueStopped(QueueEventArgs e) => this._queueStopped(e);
 
-        public void RaiseTaskScheduled(TaskEventArgs e)
-        {
-            this._taskScheduled(e);
-        }
+        public void RaiseTaskScheduled(TaskEventArgs e) => this._taskScheduled(e);
 
-        public void RaiseTaskCanceling(TaskCancelingEventArgs e)
-        {
-            this._taskCanceling(e);
-        }
+        public void RaiseTaskCanceling(TaskCancelingEventArgs e) => this._taskCanceling(e);
 
-        public void RaiseTaskCanceled(TaskEventArgs e)
-        {
-            this._taskCanceled(e);
-        }
+        public void RaiseTaskCanceled(TaskEventArgs e) => this._taskCanceled(e);
 
-        public void RaiseTaskExecuting(TaskEventArgs e)
-        {
-            this._taskExecuting(e);
-        }
+        public void RaiseTaskExecuting(TaskEventArgs e) => this._taskExecuting(e);
 
-        public void RaiseTaskExecuted(TaskEventArgs e)
-        {
-            this._taskExecuted(e);
-        }
+        public void RaiseTaskExecuted(TaskEventArgs e) => this._taskExecuted(e);
 
-        public void RaiseTaskException(TaskExceptionEventArgs e)
-        {
-            this._taskException(e);
-        }
+        public void RaiseTaskException(TaskExceptionEventArgs e) => this._taskException(e);
     }
 }
