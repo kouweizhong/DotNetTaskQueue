@@ -1,6 +1,6 @@
+using Sundstrom.Tasks;
 using System;
 using System.Threading.Tasks;
-using Sundstrom.Tasks;
 
 class Program
 {
@@ -15,21 +15,13 @@ class Program
 
         queue.CancelOnException = true;
 
-        queue.TaskScheduled += (s, e) => {
-            Console.WriteLine($"Task {e.Tag} was scheduled.");
-        };
+        queue.TaskScheduled += (s, e) => Console.WriteLine($"Task {e.Tag} was scheduled.");
 
-        queue.TaskCanceled += (s, e) => {
-            Console.WriteLine($"Task {e.Tag} was canceled.");
-        };
+        queue.TaskCanceled += (s, e) => Console.WriteLine($"Task {e.Tag} was canceled.");
 
-        queue.TaskExecuted += (s, e) => {
-            Console.WriteLine($"Task {e.Tag} was executed.");
-        };
+        queue.TaskExecuted += (s, e) => Console.WriteLine($"Task {e.Tag} was executed.");
 
-        queue.Empty += (s, e) => {
-            Console.WriteLine("The queue is empty.");
-        };
+        queue.Empty += (s, e) => Console.WriteLine("The queue is empty.");
 
         queue.Start();
 

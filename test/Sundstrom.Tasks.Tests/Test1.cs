@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using Sundstrom.Tasks.Scheduling;
+using System;
 using System.Threading.Tasks;
 using Xunit;
-using Sundstrom.Tasks;
-using Sundstrom.Tasks.Scheduling;
 
 namespace Sundstrom.Tasks.Tests
 {

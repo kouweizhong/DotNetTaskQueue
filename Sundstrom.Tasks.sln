@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.25920.0
+VisualStudioVersion = 15.0.26127.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{74768DEE-519D-4C43-B8E1-7344F18CE64B}"
 EndProject
@@ -19,6 +19,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sundstrom.Tasks.Tests", "test\Sundstrom.Tasks.Tests\Sundstrom.Tasks.Tests.csproj", "{3088D074-03C1-4E1E-BB0A-FCCA0693EA99}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{CBB9E37E-1AEA-4B28-BB06-CC42F33F7E91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{85CF271F-D3CD-4ECF-B012-1418B6181F2D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "sample\test\test.csproj", "{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8D2FA0BC-807C-4BE1-BAB9-12B199ED2BAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +60,18 @@ Global
 		{3088D074-03C1-4E1E-BB0A-FCCA0693EA99}.Release|x64.Build.0 = Release|x64
 		{3088D074-03C1-4E1E-BB0A-FCCA0693EA99}.Release|x86.ActiveCfg = Release|x86
 		{3088D074-03C1-4E1E-BB0A-FCCA0693EA99}.Release|x86.Build.0 = Release|x86
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Debug|x64.ActiveCfg = Debug|x64
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Debug|x64.Build.0 = Debug|x64
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Debug|x86.ActiveCfg = Debug|x86
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Debug|x86.Build.0 = Debug|x86
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Release|x64.ActiveCfg = Release|x64
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Release|x64.Build.0 = Release|x64
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Release|x86.ActiveCfg = Release|x86
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,5 +79,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{4C82FA18-1AA2-4F7B-B6ED-FA6E1010265A} = {74768DEE-519D-4C43-B8E1-7344F18CE64B}
 		{3088D074-03C1-4E1E-BB0A-FCCA0693EA99} = {CBB9E37E-1AEA-4B28-BB06-CC42F33F7E91}
+		{70DFBCA9-2B7C-48D1-9554-A6EB45EA13BF} = {8D2FA0BC-807C-4BE1-BAB9-12B199ED2BAC}
+		{8D2FA0BC-807C-4BE1-BAB9-12B199ED2BAC} = {85CF271F-D3CD-4ECF-B012-1418B6181F2D}
 	EndGlobalSection
 EndGlobal

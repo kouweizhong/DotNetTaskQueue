@@ -1,10 +1,8 @@
+using Sundstrom.Tasks.Scheduling;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sundstrom.Tasks;
-using Sundstrom.Tasks.Scheduling;
 
 namespace Sundstrom.Tasks
 {
