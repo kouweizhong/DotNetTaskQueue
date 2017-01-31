@@ -6,10 +6,10 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/test/Sundstrom.Tasks.Tests/bin/Debug/netcoreapp1.0/Sundstrom.Tasks.Tests.dll",
+            "program": "${workspaceRoot}/sample/test/bin/Debug/netcoreapp1.0/test.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
-            "externalConsole": false,
+            "externalConsole": true,
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart"
         },
