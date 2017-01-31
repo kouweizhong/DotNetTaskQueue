@@ -16,7 +16,8 @@ namespace Sundstrom.Tasks
         private bool _cancelOnException = true;
         private TimeSpan _delay;
 
-        private static TaskQueue _default;
+        private static volatile TaskQueue _default;
+        private static object syncRoot = new Object();
 
         /// <summary>
         /// Initializes a TaskQueue.
@@ -293,8 +294,11 @@ namespace Sundstrom.Tasks
             {
                 if (_default == null)
                 {
-                    _default = new TaskQueue(string.Empty, null);
-                    _queues[string.Empty] = _default;
+                    lock(syncRoot) 
+                    {
+                        _default = new TaskQueue(string.Empty, null);
+                        _queues[string.Empty] = _default;
+                    }
                 }
                 return _default;
             }

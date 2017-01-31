@@ -80,9 +80,7 @@ namespace Sundstrom.Tasks.Scheduling
 
                     // Peek the current task.
 
-                    var task = context.Queue.Peek();
-
-                    _current = task;
+                    _current = context.Queue.Peek();
 
                     try
                     {
@@ -91,16 +89,16 @@ namespace Sundstrom.Tasks.Scheduling
 
                         // Execute the current task.
 
-                        context.RaiseTaskExecuting(new TaskEventArgs(task.Tag));
+                        context.RaiseTaskExecuting(new TaskEventArgs(_current.Tag));
 
-                        await task.Action(task, context.CancellationToken);
+                        await _current.Action(_current, context.CancellationToken);
                     }
                     catch (Exception exc)
                     {
                         // Handle any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        var eventArgs = new TaskExceptionEventArgs(task.Tag, exc, context.CancelOnException);
+                        var eventArgs = new TaskExceptionEventArgs(_current.Tag, exc, context.CancelOnException);
 
                         context.RaiseTaskException(eventArgs);
 
@@ -112,7 +110,7 @@ namespace Sundstrom.Tasks.Scheduling
                         }
                     }
 
-                    context.RaiseTaskExecuted(new TaskEventArgs(task.Tag));
+                    context.RaiseTaskExecuted(new TaskEventArgs(_current.Tag));
 
                     _current = null;
 
