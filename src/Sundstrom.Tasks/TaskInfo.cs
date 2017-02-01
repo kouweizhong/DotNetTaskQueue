@@ -13,15 +13,15 @@ namespace Sundstrom.Tasks
 
         internal TaskInfo(TaskQueue queue, Func<TaskInfo, CancellationToken, Task> action)
         {
-            this.Queue = queue;
-            this.Action = action;
+            Queue = queue;
+            Action = action;
         }
 
         internal TaskInfo(TaskQueue queue, Func<TaskInfo, CancellationToken, Task> action, string taskTag)
         {
-            this.Queue = queue;
-            this.Action = action;
-            this.Tag = taskTag;
+            Queue = queue;
+            Action = action;
+            Tag = taskTag;
         }
 
         /// <summary>

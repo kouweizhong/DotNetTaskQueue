@@ -24,8 +24,8 @@ namespace Sundstrom.Tasks.Scheduling
         {
             this.cts = cts;
 
-            this.Queue = queue;
-            this.IsInvalid = false;
+            Queue = queue;
+            IsInvalid = false;
         }
 
         internal CancellationTokenSource CancellationTokenSource => cts;
@@ -44,22 +44,22 @@ namespace Sundstrom.Tasks.Scheduling
 
         public void Remove(TaskInfo task) => Queue = new Queue<TaskInfo>(Queue.Where(x => x != task));
 
-        public void RaiseQueueEmpty(QueueEventArgs e) => this._queueEmpty(e);
+        public void RaiseQueueEmpty(QueueEventArgs e) => _queueEmpty(e);
 
-        public void RaiseQueueStarted(QueueEventArgs e) => this._queueStarted(e);
+        public void RaiseQueueStarted(QueueEventArgs e) => _queueStarted(e);
 
-        public void RaiseQueueStopped(QueueEventArgs e) => this._queueStopped(e);
+        public void RaiseQueueStopped(QueueEventArgs e) => _queueStopped(e);
 
-        public void RaiseTaskScheduled(TaskEventArgs e) => this._taskScheduled(e);
+        public void RaiseTaskScheduled(TaskEventArgs e) => _taskScheduled(e);
 
-        public void RaiseTaskCanceling(TaskCancelingEventArgs e) => this._taskCanceling(e);
+        public void RaiseTaskCanceling(TaskCancelingEventArgs e) => _taskCanceling(e);
 
-        public void RaiseTaskCanceled(TaskEventArgs e) => this._taskCanceled(e);
+        public void RaiseTaskCanceled(TaskEventArgs e) => _taskCanceled(e);
 
-        public void RaiseTaskExecuting(TaskEventArgs e) => this._taskExecuting(e);
+        public void RaiseTaskExecuting(TaskEventArgs e) => _taskExecuting(e);
 
-        public void RaiseTaskExecuted(TaskEventArgs e) => this._taskExecuted(e);
+        public void RaiseTaskExecuted(TaskEventArgs e) => _taskExecuted(e);
 
-        public void RaiseTaskException(TaskExceptionEventArgs e) => this._taskException(e);
+        public void RaiseTaskException(TaskExceptionEventArgs e) => _taskException(e);
     }
 }
