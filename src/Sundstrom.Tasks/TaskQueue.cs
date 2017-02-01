@@ -112,6 +112,11 @@ namespace Sundstrom.Tasks
         {
             EnsureContextIsCreated();
 
+            if(task.Queue == null)
+            {
+                task.Queue = this;
+            }
+
             Scheduler.Schedule(_context, task);
             return this;
         }
