@@ -4,14 +4,14 @@ namespace Sundstrom.Tasks
 {
     public abstract class TaskEventArgsBase : EventArgs
     {
-        internal TaskEventArgsBase(string tag)
+        internal TaskEventArgsBase(TaskInfo task)
         {
-            Tag = tag;
+            Task = task;
         }
 
         /// <summary>
-        /// Gets the tag associated with this task. (if any)
+        /// Gets the task.
         /// </summary>
-        public string Tag { get; }
+        public TaskInfo Task { get; }
     }
 }

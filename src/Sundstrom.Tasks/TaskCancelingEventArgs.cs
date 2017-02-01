@@ -2,8 +2,8 @@ namespace Sundstrom.Tasks
 {
     public class TaskCancelingEventArgs : TaskEventArgsBase
     {
-        internal TaskCancelingEventArgs(string tag, bool cancel)
-            : base(tag)
+        internal TaskCancelingEventArgs(TaskInfo task, bool cancel)
+            : base(task)
         {
             Cancel = cancel;
         }

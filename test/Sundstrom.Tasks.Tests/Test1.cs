@@ -120,8 +120,8 @@ namespace Sundstrom.Tasks.Tests
 
             queue.TaskException += (sender, args) =>
             {
-                tag = args.Tag;
-                Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
+                tag = args.Task.Tag;
+                Console.WriteLine($"Exception in \"{args.Task.Tag}\":\n\n{args.Exception}");
             };
 
             await queue.Schedule("Task 1", async (context, ct) =>
@@ -167,8 +167,8 @@ namespace Sundstrom.Tasks.Tests
 
             queue.TaskException += (sender, args) =>
             {
-                tag = args.Tag;
-                Console.WriteLine($"Exception in \"{args.Tag}\":\n\n{args.Exception}");
+                tag = args.Task.Tag;
+                Console.WriteLine($"Exception in \"{args.Task.Tag}\":\n\n{args.Exception}");
 
                 args.Cancel = false;
             };
@@ -215,7 +215,7 @@ namespace Sundstrom.Tasks.Tests
 
             queue.TaskException += (s, e) =>
             {
-                Console.WriteLine(e.Tag);
+                Console.WriteLine(e.Task.Tag);
                 e.Cancel = false;
             };
 
@@ -286,18 +286,19 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Run4));
 
-            var queue = TaskQueue.Create("9");
+            var queue = TaskQueue.Default;
 
             queue.CancelOnException = true;
 
-            queue.Empty += (s, e) => Console.WriteLine("Empty");
+            queue.TaskException += (s, e) => Console.WriteLine(e.Exception);
+            queue.Empty += (s, e) => Console.WriteLine("Queue is empty.");
 
             await queue
-                .Schedule("Task 1", (context, ct) => Console.WriteLine("Task 1"))
-                .Schedule("Task 2", (context, ct) => Console.WriteLine("Task 2"))
-                .Schedule("Task 3", (context, ct) => Console.WriteLine("Task 3"))
-                .Start()
-                .AwaitIsEmpty();
+            .Schedule("Task 1", (t, ct) => Console.WriteLine(t.Tag))
+            .Schedule("Task 2", (t, ct) => Console.WriteLine(t.Tag))
+            .Schedule("Task 3", (t, ct) => Console.WriteLine(t.Tag))
+            .Start()
+            .AwaitIsEmpty();
         }
     }
 }

@@ -4,8 +4,8 @@ namespace Sundstrom.Tasks
 {
     public class TaskExceptionEventArgs : TaskEventArgsBase
     {
-        internal TaskExceptionEventArgs(string tag, Exception exception, bool cancel)
-            : base(tag)
+        internal TaskExceptionEventArgs(TaskInfo task, Exception exception, bool cancel)
+            : base(task)
         {
             Exception = exception;
 

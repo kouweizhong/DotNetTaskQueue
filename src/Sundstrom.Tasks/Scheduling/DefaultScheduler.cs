@@ -61,7 +61,7 @@ namespace Sundstrom.Tasks.Scheduling
 
                         // Execute the current task.
 
-                        context.RaiseTaskExecuting(new TaskEventArgs(_current.Tag));
+                        context.RaiseTaskExecuting(new TaskEventArgs(_current));
 
                         await _current.Action(_current, context.CancellationToken);
                     }
@@ -70,7 +70,7 @@ namespace Sundstrom.Tasks.Scheduling
                         // Handle any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        var eventArgs = new TaskExceptionEventArgs(_current.Tag, exc, context.CancelOnException);
+                        var eventArgs = new TaskExceptionEventArgs(_current, exc, context.CancelOnException);
 
                         context.RaiseTaskException(eventArgs);
 
@@ -82,7 +82,7 @@ namespace Sundstrom.Tasks.Scheduling
                         }
                     }
 
-                    context.RaiseTaskExecuted(new TaskEventArgs(_current.Tag));
+                    context.RaiseTaskExecuted(new TaskEventArgs(_current));
 
                     _current = null;
 
@@ -109,7 +109,7 @@ namespace Sundstrom.Tasks.Scheduling
         public override void Schedule(SchedulerContext context, TaskInfo task)
         {
             context.Queue.Enqueue(task);
-            context.RaiseTaskScheduled(new TaskEventArgs(task.Tag));
+            context.RaiseTaskScheduled(new TaskEventArgs(task));
 
             Next(context);
         }
@@ -139,13 +139,13 @@ namespace Sundstrom.Tasks.Scheduling
                 throw new InvalidOperationException("Not part of this queue.");
             }
 
-            var e = new TaskCancelingEventArgs(task.Tag, true);
+            var e = new TaskCancelingEventArgs(task, true);
             context.RaiseTaskCanceling(e);
             if (e.Cancel)
             {
                 context.Remove(item);
 
-                var e2 = new TaskEventArgs(task.Tag);
+                var e2 = new TaskEventArgs(task);
                 context.RaiseTaskCanceled(e2);
             }
         }
@@ -157,7 +157,7 @@ namespace Sundstrom.Tasks.Scheduling
             while (context.Queue.Count > 0)
             {
                 var task = context.Queue.Dequeue();
-                context.RaiseTaskCanceled(new TaskEventArgs(task.Tag));
+                context.RaiseTaskCanceled(new TaskEventArgs(task));
             }
         }
 

@@ -2,8 +2,8 @@
 {
     public class TaskEventArgs : TaskEventArgsBase
     {
-        internal TaskEventArgs(string tag)
-            : base(tag)
+        internal TaskEventArgs(TaskInfo task)
+            : base(task)
         {
         }
     }
