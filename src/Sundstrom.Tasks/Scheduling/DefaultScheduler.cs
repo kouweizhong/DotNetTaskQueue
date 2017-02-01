@@ -1,15 +1,12 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sundstrom.Tasks.Scheduling
 {
-    public sealed class DefaultScheduler : Scheduler
+    public sealed class DefaultScheduler : Scheduler<TaskInfo, SchedulerContext<TaskInfo>>
     {
-        public DefaultScheduler()
-        {
-        }
-
         private bool _isStarted;
 
         private bool _isStopped;
@@ -28,7 +25,7 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override TaskInfo Current => _current;
 
-        public override async Task Next(SchedulerContext context)
+        public override async Task Next(SchedulerContext<TaskInfo> context)
         {
             if (context.CancellationToken.IsCancellationRequested)
                 return;
@@ -106,7 +103,7 @@ namespace Sundstrom.Tasks.Scheduling
             }
         }
 
-        public override void Schedule(SchedulerContext context, TaskInfo task)
+        public override void Schedule(SchedulerContext<TaskInfo> context, TaskInfo task)
         {
             context.Queue.Enqueue(task);
             context.RaiseTaskScheduled(new TaskEventArgs(task));
@@ -114,7 +111,7 @@ namespace Sundstrom.Tasks.Scheduling
             Next(context);
         }
 
-        public override void Stop(SchedulerContext context)
+        public override void Stop(SchedulerContext<TaskInfo> context)
         {
             if (!_isStarted)
             {
@@ -131,7 +128,7 @@ namespace Sundstrom.Tasks.Scheduling
             context.RaiseQueueStopped(new QueueEventArgs());
         }
 
-        public override void Deschedule(SchedulerContext context, TaskInfo task)
+        public override void Deschedule(SchedulerContext<TaskInfo> context, TaskInfo task)
         {
             var item = context.Queue.FirstOrDefault(x => x == task);
             if (item == null)
@@ -150,7 +147,7 @@ namespace Sundstrom.Tasks.Scheduling
             }
         }
 
-        public override void Clear(SchedulerContext context)
+        public override void Clear(SchedulerContext<TaskInfo> context)
         {
             if (_isBusy) throw new InvalidOperationException();
 
@@ -161,13 +158,13 @@ namespace Sundstrom.Tasks.Scheduling
             }
         }
 
-        private void ClearCore(SchedulerContext context)
+        private void ClearCore(SchedulerContext<TaskInfo> context)
         {
             _isBusy = false;
             Clear(context);
         }
 
-        public override void Start(SchedulerContext context)
+        public override void Start(SchedulerContext<TaskInfo> context)
         {
             if (_isStarted)
             {
@@ -179,6 +176,32 @@ namespace Sundstrom.Tasks.Scheduling
             Next(context);
 
             context.RaiseQueueStarted(new QueueEventArgs());
+        }
+
+        public override SchedulerContext<TaskInfo> GetContext(TaskQueue taskQueue, ITaskCollection<TaskInfo> items, CancellationTokenSource cts, QueueData queueData)
+        {
+            return new SchedulerContext<TaskInfo>(items, cts)
+            {
+                Delay = taskQueue.Delay,
+                CancelOnException = taskQueue.CancelOnException,
+
+                _queueEmpty = queueData.RaiseQueueEmpty,
+
+                _queueStarted = queueData.RaiseQueueStarted,
+                _queueStopped = queueData.RaiseQueueStopped,
+
+                _taskScheduled = queueData.RaiseTaskScheduled,
+                _taskCanceled = queueData.RaiseTaskCanceled,
+                _taskCanceling = queueData.RaiseTaskCanceling,
+                _taskExecuting = queueData.RaiseTaskExecuting,
+                _taskExecuted = queueData.RaiseTaskExecuted,
+                _taskException = queueData.RaiseTaskException,
+            };
+        }
+
+        public override ITaskCollection<TaskInfo> CreateCollection()
+        {
+            return new TaskCollection<TaskInfo>();
         }
     }
 }

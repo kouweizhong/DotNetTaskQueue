@@ -9,9 +9,10 @@ namespace Sundstrom.Tasks
     /// <summary>
     /// Simple task queue
     /// </summary>
-    public class TaskQueue
+    public class TaskQueue //<TTaskInfo, TScheduler>
     {
-        internal SchedulerContext _context;
+        internal ISchedulerContext _schedulerContext;
+
         private bool _cancelOnException = true;
         private TimeSpan _delay;
 
@@ -49,7 +50,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Initializes a TaskQueue.
         /// </summary>
-        public TaskQueue(Scheduler scheduler)
+        public TaskQueue(IScheduler scheduler)
         {
             Scheduler = scheduler;
         }
@@ -58,7 +59,7 @@ namespace Sundstrom.Tasks
         /// Initializes a TaskQueue with a tag.
         /// </summary>
         /// <param name="tag"></param>
-        public TaskQueue(Scheduler scheduler, string tag)
+        public TaskQueue(IScheduler scheduler, string tag)
         : this(scheduler)
         {
             Tag = tag;
@@ -69,7 +70,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="data"></param>
-        public TaskQueue(Scheduler scheduler, string tag, object data)
+        public TaskQueue(IScheduler scheduler, string tag, object data)
         : this(scheduler, tag)
         {
             Data = data;
@@ -89,7 +90,7 @@ namespace Sundstrom.Tasks
         /// Gets the scheduler.
         /// </summary>
         /// <value>The scheduler.</value>
-        public Scheduler Scheduler { get; }
+        public IScheduler Scheduler { get; }
 
         /// <summary>
         /// Starts the queue.
@@ -97,9 +98,9 @@ namespace Sundstrom.Tasks
         /// <returns>The start.</returns>
         public TaskQueue Start()
         {
-            EnsureContextIsCreated();
+            EnsureSchedulerContextIsSet();
 
-            Scheduler.Start(_context);
+            Scheduler.Start(_schedulerContext);
             return this;
         }
 
@@ -110,14 +111,14 @@ namespace Sundstrom.Tasks
         /// <param name="task">Task.</param>
         public TaskQueue Schedule(TaskInfo task)
         {
-            EnsureContextIsCreated();
+            EnsureSchedulerContextIsSet();
 
             if(task.Queue == null)
             {
                 task.Queue = this;
             }
 
-            Scheduler.Schedule(_context, task);
+            Scheduler.Schedule(_schedulerContext, task);
             return this;
         }
 
@@ -126,9 +127,9 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue Stop()
         {
-            _context.Invalidate();
+            _schedulerContext.Invalidate();
 
-            Scheduler.Stop(_context);
+            Scheduler.Stop(_schedulerContext);
 
             return this;
         }
@@ -139,7 +140,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue Deschedule(TaskInfo task)
         {
-            Scheduler.Deschedule(_context, task);
+            Scheduler.Deschedule(_schedulerContext, task);
 
             return this;
         }
@@ -149,7 +150,7 @@ namespace Sundstrom.Tasks
         /// </summary>
         public TaskQueue Clear()
         {
-            Scheduler.Clear(_context);
+            Scheduler.Clear(_schedulerContext);
 
             return this;
         }
@@ -246,12 +247,12 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets the number of tasks currently in the queue.
         /// </summary>
-        public int Count => _context.Queue.Count;
+        public int Count => _schedulerContext.Queue.Count;
 
         /// <summary>
         /// Gets a value that indicates whether this queue is empty of not.
         /// </summary>
-        public bool IsEmpty => _context.Queue.Count == 0;
+        public bool IsEmpty => _schedulerContext.Queue.Count == 0;
 
         /// <summary>
         /// Gets the default queue.
@@ -294,7 +295,7 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static TaskQueue Create(Scheduler scheduler, string tag, object data = null)
+        public static TaskQueue Create(IScheduler scheduler, string tag, object data = null)
         {
             if (scheduler == null)
                 throw new ArgumentNullException(nameof(scheduler));
@@ -323,35 +324,33 @@ namespace Sundstrom.Tasks
 
         #region Internals
 
-        private void EnsureContextIsCreated()
+        private void EnsureSchedulerContextIsSet()
         {
-            if (_context == null || _context.IsInvalid)
+            if (_schedulerContext == null || _schedulerContext.IsInvalid)
             {
-                CreateContext();
+                SetSchedulerContext();
             }
         }
 
-        private void CreateContext()
+        private void SetSchedulerContext()
         {
             var cts = new CancellationTokenSource();
 
-            Queue<TaskInfo> queue;
+            ITaskCollection collection = null;
 
-            if (_context != null)
+            if (_schedulerContext != null)
             {
                 // Restore existing queue context.
 
-                queue = _context.Queue;
+                collection = _schedulerContext.Queue;
             }
             else
             {
-                queue = new Queue<TaskInfo>();
+                collection = Scheduler.CreateCollection();
             }
-            _context = new SchedulerContext(queue, cts)
-            {
-                Delay = Delay,
-                CancelOnException = CancelOnException,
 
+            var queueData = new QueueData()
+            {
                 _queueEmpty = RaiseQueueEmpty,
 
                 _queueStarted = RaiseQueueStarted,
@@ -362,8 +361,10 @@ namespace Sundstrom.Tasks
                 _taskCanceling = RaiseTaskCanceling,
                 _taskExecuting = RaiseTaskExecuting,
                 _taskExecuted = RaiseTaskExecuted,
-                _taskException = RaiseTaskException,
+                _taskException = RaiseTaskException
             };
+
+            _schedulerContext = Scheduler.GetContext(this, collection, cts, queueData);
         }
 
         private void RaiseQueueEmpty(QueueEventArgs e) => Empty?.Invoke(this, e);

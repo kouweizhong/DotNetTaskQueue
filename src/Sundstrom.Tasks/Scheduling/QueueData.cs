@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System;
 
 namespace Sundstrom.Tasks.Scheduling
 {
-    public class SchedulerContext<TTaskInfo> : ISchedulerContext<TTaskInfo>
-        where TTaskInfo : TaskInfo
+    public sealed class QueueData
     {
-        private CancellationTokenSource cts = new CancellationTokenSource();
-
         internal Action<QueueEventArgs> _queueEmpty;
         internal Action<QueueEventArgs> _queueStarted;
         internal Action<QueueEventArgs> _queueStopped;
@@ -20,34 +14,6 @@ namespace Sundstrom.Tasks.Scheduling
         internal Action<TaskEventArgs> _taskExecuting;
         internal Action<TaskEventArgs> _taskExecuted;
         internal Action<TaskExceptionEventArgs> _taskException;
-
-        public SchedulerContext(ITaskCollection<TTaskInfo> queue, CancellationTokenSource cts)
-        {
-            this.cts = cts;
-
-            Queue = queue;
-            IsInvalid = false;
-        }
-
-        internal CancellationTokenSource CancellationTokenSource => cts;
-
-        public CancellationToken CancellationToken => cts.Token;
-
-        public TimeSpan Delay { get; internal set; }
-
-        public bool CancelOnException { get; internal set; }
-
-        public ITaskCollection<TTaskInfo> Queue { get; private set; }
-
-        ITaskCollection ISchedulerContext.Queue => Queue;
-
-        public bool IsInvalid { get; private set; }
-
-        public void Invalidate() => IsInvalid = true;
-
-        public void Remove(TTaskInfo task) => Queue.Remove(task);
-
-        void ISchedulerContext.Remove(TaskInfo task) => Queue.Remove((TTaskInfo)task);
 
         public void RaiseQueueEmpty(QueueEventArgs e) => _queueEmpty?.Invoke(e);
 
