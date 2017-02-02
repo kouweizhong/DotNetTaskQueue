@@ -160,7 +160,7 @@ namespace Sundstrom.Tasks.Scheduling
             context.RaiseQueueStarted(new QueueEventArgs());
         }
 
-        public override SchedulerContext<TaskInfo> GetContext(TaskQueue taskQueue, ITaskCollection<TaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData)
+        public override SchedulerContext<TaskInfo> GetContext(ITaskQueue<TaskInfo> taskQueue, ITaskCollection<TaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData)
         {
             return new SchedulerContext<TaskInfo>(items, cts)
             {

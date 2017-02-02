@@ -52,11 +52,11 @@ namespace Sundstrom.Tasks.Scheduling
             Schedule((TSchedulerContext)context, (TTaskInfo)task);
         }
 
-        public abstract TSchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData);
+        public abstract TSchedulerContext GetContext(ITaskQueue<TTaskInfo> taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData);
 
-        ISchedulerContext IScheduler.GetContext(TaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, SchedulerContextData queueData)
+        ISchedulerContext IScheduler.GetContext(ITaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, SchedulerContextData queueData)
         {
-            return GetContext(taskQueue, (ITaskCollection<TTaskInfo>)items, cts, queueData);
+            return GetContext((ITaskQueue<TTaskInfo>)taskQueue, (ITaskCollection<TTaskInfo>)items, cts, queueData);
         }
 
         public abstract ITaskCollection<TTaskInfo> CreateCollection();

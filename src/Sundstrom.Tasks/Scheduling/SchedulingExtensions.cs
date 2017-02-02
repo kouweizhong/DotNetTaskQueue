@@ -7,14 +7,18 @@ namespace Sundstrom.Tasks.Scheduling
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static ISchedulerContext GetSchedulerContext(this TaskQueue source) => source._schedulerContext;
+        public static ISchedulerContext GetSchedulerContext<TTaskInfo>(this ITaskQueue<TTaskInfo> source)
+            where TTaskInfo : TaskInfo
+            => (source as TaskQueue<TTaskInfo>)._schedulerContext;
 
-        //public static TSchedulerContext GetSchedulerContext<TScheduler, TSchedulerContext, TTaskInfo>(this TaskQueue<TTaskInfo, TScheduler> source)
-        //    where TScheduler : IScheduler<TTaskInfo, TSchedulerContext>
-        //    where TSchedulerContext : ISchedulerContext<TTaskInfo>
-        //    where TTaskInfo : TaskInfo
-        //    => (TSchedulerContext)source._schedulerContext;
+        public static TSchedulerContext GetSchedulerContext<TScheduler, TSchedulerContext, TTaskInfo>(this ITaskQueue<TTaskInfo> source)
+            where TScheduler : IScheduler<TTaskInfo, TSchedulerContext>
+            where TSchedulerContext : ISchedulerContext<TTaskInfo>
+            where TTaskInfo : TaskInfo
+            => (TSchedulerContext)(source as TaskQueue<TTaskInfo>)._schedulerContext;
 
-        public static TaskInfo GetCurrentTask(this TaskQueue source) => source._schedulerContext.Current;
+        public static TTaskInfo GetCurrentTask<TTaskInfo>(this ITaskQueue<TTaskInfo> source)
+            where TTaskInfo : TaskInfo
+            => (source as TaskQueue<TTaskInfo>)._schedulerContext.Current;
     }
 }

@@ -15,7 +15,7 @@ namespace Sundstrom.Tasks.Scheduling
         void Start(TSchedulerContext context);
         void Stop(TSchedulerContext context);
 
-        TSchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData);
+        TSchedulerContext GetContext(ITaskQueue<TTaskInfo> taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData);
         new ITaskCollection<TTaskInfo> CreateCollection();
     }
 }

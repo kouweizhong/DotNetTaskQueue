@@ -13,7 +13,7 @@ namespace Sundstrom.Tasks.Scheduling
         void Start(ISchedulerContext context);
         void Stop(ISchedulerContext context);
 
-        ISchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, SchedulerContextData queueData);
+        ISchedulerContext GetContext(ITaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, SchedulerContextData queueData);
         ITaskCollection CreateCollection();
     }
 }

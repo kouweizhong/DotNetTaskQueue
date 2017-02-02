@@ -24,13 +24,13 @@ namespace Sundstrom.Tasks
             Tag = taskTag;
         }
 
-        internal TaskInfo(TaskQueue queue, Func<TaskInfo, CancellationToken, Task> action)
+        internal TaskInfo(ITaskQueue queue, Func<TaskInfo, CancellationToken, Task> action)
         {
             Queue = queue;
             Action = action;
         }
 
-        internal TaskInfo(TaskQueue queue, Func<TaskInfo, CancellationToken, Task> action, string taskTag)
+        internal TaskInfo(ITaskQueue queue, Func<TaskInfo, CancellationToken, Task> action, string taskTag)
         {
             Queue = queue;
             Action = action;
@@ -40,7 +40,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets the queue.
         /// </summary>
-        public TaskQueue Queue { get; internal set; }
+        public ITaskQueue Queue { get; internal set; }
 
         /// <summary>
         /// Gets the tag. (if any)

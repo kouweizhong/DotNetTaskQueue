@@ -13,10 +13,11 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static TaskQueue Schedule(this TaskQueue source, Func<TaskInfo, CancellationToken, Task> action)
+        public static ITaskQueue<TTaskInfo> Schedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, Func<TaskInfo, CancellationToken, Task> action)
+            where TTaskInfo : TaskInfo
         {
             var taskInfo = new TaskInfo(source, action);
-            return source.Schedule(taskInfo);
+            return (ITaskQueue<TTaskInfo>)source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -25,10 +26,11 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static TaskQueue Schedule(this TaskQueue source, string tag, Func<TaskInfo, CancellationToken, Task> action)
+        public static ITaskQueue<TTaskInfo> Schedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, string tag, Func<TaskInfo, CancellationToken, Task> action)
+            where TTaskInfo : TaskInfo
         {
             var taskInfo = new TaskInfo(source, action, tag);
-            return source.Schedule(taskInfo);
+            return (ITaskQueue<TTaskInfo>)source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -36,10 +38,11 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static TaskQueue Schedule(this TaskQueue source, Action<TaskInfo, CancellationToken> action)
+        public static ITaskQueue<TTaskInfo> Schedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, Action<TaskInfo, CancellationToken> action)
+            where TTaskInfo : TaskInfo
         {
             var taskInfo = new TaskInfo(source, async (q, ct) => action(q, ct));
-            return source.Schedule(taskInfo);
+            return (ITaskQueue<TTaskInfo>)source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -48,10 +51,11 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static TaskQueue Schedule(this TaskQueue source, string tag, Action<TaskInfo, CancellationToken> action)
+        public static ITaskQueue<TTaskInfo> Schedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, string tag, Action<TaskInfo, CancellationToken> action)
+            where TTaskInfo : TaskInfo
         {
             var taskInfo = new TaskInfo(source, async (q, ct) => action(q, ct), tag);
-            return source.Schedule(taskInfo);
+            return (ITaskQueue<TTaskInfo>)source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -59,10 +63,11 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="task"></param>
         /// <returns></returns>
-        public static TaskQueue Schedule(this TaskQueue source, Task task)
+        public static ITaskQueue<TTaskInfo> Schedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, Task task)
+            where TTaskInfo : TaskInfo
         {
             var taskInfo = new TaskInfo(source, async (q, ct) => await task);
-            return source.Schedule(taskInfo);
+            return (ITaskQueue<TTaskInfo>)source.Schedule(taskInfo);
         }
 
         /// <summary>
@@ -71,17 +76,19 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public static TaskQueue Schedule(this TaskQueue source, string tag, Task task)
+        public static ITaskQueue<TTaskInfo> Schedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, string tag, Task task)
+            where TTaskInfo : TaskInfo
         {
             var taskInfo = new TaskInfo(source, async (q, ct) => await task);
-            return source.Schedule(taskInfo);
+            return (ITaskQueue<TTaskInfo>)source.Schedule(taskInfo);
         }
 
         /// <summary>
         /// Cancel the task with the specified tag.
         /// <param name="tag"></param>
         /// </summary>
-        public static TaskQueue Deschedule(this TaskQueue source, string tag)
+        public static ITaskQueue<TTaskInfo> Deschedule<TTaskInfo>(this ITaskQueue<TTaskInfo> source, string tag)
+            where TTaskInfo : TaskInfo
         {
             var context = source.GetSchedulerContext();
             var queue = context.Queue;
@@ -90,21 +97,22 @@ namespace Sundstrom.Tasks
             {
                 throw new InvalidOperationException($"Task with tag \"{tag}\" does not exist.");
             }
-            return source.Deschedule(item);
+            return (ITaskQueue<TTaskInfo>)source.Deschedule(item);
         }
 
         /// <summary>
         /// Waits for the queue to be empty.
         /// </summary>
         /// <returns>The current queue.</returns>
-        public static async Task<TaskQueue> AwaitIsEmpty(this TaskQueue source)
+        public static async Task<ITaskQueue<TTaskInfo>> AwaitIsEmpty<TTaskInfo>(this ITaskQueue<TTaskInfo> source)
+            where TTaskInfo : TaskInfo
         {
             if(source.IsEmpty)
             {
                 return source;
             }
             EventHandler<QueueEventArgs> handler = null;
-            var tcs = new TaskCompletionSource<TaskQueue>();
+            var tcs = new TaskCompletionSource<ITaskQueue<TTaskInfo>>();
             handler = (s, e) => {
                 source.Empty -= handler;
                 tcs.SetResult(source);
@@ -117,14 +125,15 @@ namespace Sundstrom.Tasks
         /// Waits for the queue to be stopped.
         /// </summary>
         /// <returns>The current queue.</returns>
-        public static async Task<TaskQueue> AwaitIsStopped(this TaskQueue source)
+        public static async Task<ITaskQueue<TTaskInfo>> AwaitIsStopped<TTaskInfo>(this ITaskQueue<TTaskInfo> source)
+            where TTaskInfo : TaskInfo
         {
             if(source.IsStopped)
             {
                 return source;
             }
             EventHandler<QueueEventArgs> handler = null;
-            var tcs = new TaskCompletionSource<TaskQueue>();
+            var tcs = new TaskCompletionSource<ITaskQueue<TTaskInfo>>();
             handler = (s, e) => {
                 source.Stopped -= handler;
                 tcs.SetResult(source);
