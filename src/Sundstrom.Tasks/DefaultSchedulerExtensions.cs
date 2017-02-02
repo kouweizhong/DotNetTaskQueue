@@ -141,5 +141,45 @@ namespace Sundstrom.Tasks
             source.Stopped += handler;
             return await tcs.Task;
         }
+
+        /// <summary>
+        /// Waits for the queue to be empty.
+        /// </summary>
+        /// <returns>The current queue.</returns>
+        public static async Task<ITaskQueue> AwaitIsEmpty(this ITaskQueue source)
+        {
+            if (source.IsEmpty)
+            {
+                return source;
+            }
+            EventHandler<QueueEventArgs> handler = null;
+            var tcs = new TaskCompletionSource<ITaskQueue>();
+            handler = (s, e) => {
+                source.Empty -= handler;
+                tcs.SetResult(source);
+            };
+            source.Empty += handler;
+            return await tcs.Task;
+        }
+
+        /// <summary>
+        /// Waits for the queue to be stopped.
+        /// </summary>
+        /// <returns>The current queue.</returns>
+        public static async Task<ITaskQueue> AwaitIsStopped(this ITaskQueue source)
+        {
+            if (source.IsStopped)
+            {
+                return source;
+            }
+            EventHandler<QueueEventArgs> handler = null;
+            var tcs = new TaskCompletionSource<ITaskQueue>();
+            handler = (s, e) => {
+                source.Stopped -= handler;
+                tcs.SetResult(source);
+            };
+            source.Stopped += handler;
+            return await tcs.Task;
+        }
     }
 }

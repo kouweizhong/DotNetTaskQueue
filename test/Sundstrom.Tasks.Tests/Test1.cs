@@ -300,5 +300,23 @@ namespace Sundstrom.Tasks.Tests
             .Start()
             .AwaitIsEmpty();
         }
+
+        [Fact]
+        public async Task Run5()
+        {
+            Console.WriteLine(nameof(Run5));
+
+            ITaskQueue queue = new TaskQueue<TaskInfo>();
+
+            queue.CancelOnException = true;
+
+            queue.TaskException += (s, e) => Console.WriteLine(e.Exception);
+            queue.Empty += (s, e) => Console.WriteLine("Queue is empty.");
+
+            await queue
+            .Schedule(new TaskInfo(async (t, ct) => Console.WriteLine(t.Tag)))
+            .Start()
+            .AwaitIsEmpty();
+        }
     }
 }
