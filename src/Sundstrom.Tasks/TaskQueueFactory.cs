@@ -6,16 +6,15 @@ using System.Threading;
 
 namespace Sundstrom.Tasks
 {
-    public static class TaskQueueFactory<TTaskInfo>
-        where TTaskInfo : TaskInfo
+    public static class TaskQueueFactory
     {
-        private static volatile TaskQueue<TaskInfo> _default;
+        private static volatile ITaskQueue<TaskInfo> _default;
         private static object syncRoot = new Object();
 
         /// <summary>
         /// Gets the default queue.
         /// </summary>
-        public static TaskQueue<TaskInfo> Default
+        public static ITaskQueue<TaskInfo> Default
         {
             get
             {
@@ -44,7 +43,9 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static TaskQueue<TTaskInfo> Create(string tag, object data = null) => Create(new DefaultScheduler(), tag, data);
+        public static ITaskQueue<TTaskInfo> Create<TTaskInfo>(string tag, object data = null)
+            where TTaskInfo : TaskInfo
+            => Create<TTaskInfo, DefaultScheduler>(new DefaultScheduler(), tag, data);
 
         /// <summary>
         /// Creates a queue with a specified Scheduler.
@@ -53,7 +54,8 @@ namespace Sundstrom.Tasks
         /// <param name="tag"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static TaskQueue<TTaskInfo> Create<TScheduler>(TScheduler scheduler, string tag, object data = null)
+        public static ITaskQueue<TTaskInfo> Create<TTaskInfo, TScheduler>(TScheduler scheduler, string tag, object data = null)
+            where TTaskInfo : TaskInfo
             where TScheduler : IScheduler
         {
             if (scheduler == null)
@@ -79,6 +81,12 @@ namespace Sundstrom.Tasks
         /// </summary>
         /// <param name="queue"></param>
         /// <returns></returns>
-        public static bool Remove(TaskQueue<TTaskInfo> queue) => _queues.Remove(queue.Tag);
+        public static bool Remove(ITaskQueue queue)
+            => _queues.Remove(queue.Tag);
+
+        /// <summary>
+        /// Clear the queue collection.
+        /// </summary>
+        public static void Clear() => _queues.Clear();
     }
 }

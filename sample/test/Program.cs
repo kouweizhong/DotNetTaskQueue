@@ -11,7 +11,7 @@ class Program
 
     static async Task MainAsync(string[] args) 
     {
-        var queue = TaskQueueFactory<TaskInfo>.Default;
+        var queue = TaskQueueFactory.Default;
 
         queue.CancelOnException = true;
 
