@@ -12,7 +12,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Synchronous));
 
-            var queue = TaskQueue.Create("1").Start();
+            var queue = TaskQueueFactory<TaskInfo>.Create("1").Start();
 
             int taskExecutedCount = 0;
 
@@ -41,7 +41,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Asynchronous));
 
-            var queue = TaskQueue.Create("2").Start();
+            var queue = TaskQueueFactory<TaskInfo>.Create("2").Start();
 
             int taskExecutedCount = 0;
 
@@ -76,7 +76,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Combo));
 
-            var queue = TaskQueue.Create("3").Start();
+            var queue = TaskQueueFactory<TaskInfo>.Create("3").Start();
 
             int taskExecutedCount = 0;
 
@@ -112,7 +112,7 @@ namespace Sundstrom.Tasks.Tests
             string tag = null;
             int taskExecutedCount = 0;
 
-            var queue = TaskQueue.Create("4");
+            var queue = TaskQueueFactory<TaskInfo>.Create("4");
 
             queue.CancelOnException = true;
 
@@ -159,7 +159,7 @@ namespace Sundstrom.Tasks.Tests
             string tag = null;
             int taskExecutedCount = 0;
 
-            var queue = TaskQueue.Create("5");
+            var queue = TaskQueueFactory<TaskInfo>.Create("5");
 
             queue.CancelOnException = true;
 
@@ -207,7 +207,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Run));
 
-            var queue = TaskQueue.Create("6");
+            var queue = TaskQueueFactory<TaskInfo>.Create("6");
 
             queue.CancelOnException = true;
 
@@ -247,7 +247,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Run2));
 
-            var queue = TaskQueue.Create("7");
+            var queue = TaskQueueFactory<TaskInfo>.Create("7");
 
             queue.CancelOnException = true;
 
@@ -262,7 +262,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Run3));
 
-            var queue = TaskQueue.Create("8");
+            var queue = TaskQueueFactory<TaskInfo>.Create("8");
 
             queue.CancelOnException = true;
 
@@ -286,7 +286,7 @@ namespace Sundstrom.Tasks.Tests
         {
             Console.WriteLine(nameof(Run4));
 
-            var queue = TaskQueue.Default;
+            var queue = TaskQueueFactory<TaskInfo>.Default;
 
             queue.CancelOnException = true;
 
