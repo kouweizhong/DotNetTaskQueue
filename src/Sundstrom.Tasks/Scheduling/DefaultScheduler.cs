@@ -7,33 +7,15 @@ namespace Sundstrom.Tasks.Scheduling
 {
     public sealed class DefaultScheduler : Scheduler<TaskInfo, SchedulerContext<TaskInfo>>
     {
-        private bool _isStarted;
-
-        private bool _isStopped;
-
-        private bool _isRunning;
-
-        private bool _isBusy;
-
-        private TaskInfo _current;
-
-        public override bool IsStarted => _isStarted;
-
-        public override bool IsRunning => _isRunning;
-
-        public override bool IsStopped => _isStopped;
-
-        public override TaskInfo Current => _current;
-
         public override async Task Next(SchedulerContext<TaskInfo> context)
         {
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
-            if (!_isBusy)
+            if (!context.IsBusy)
             {
                 // Do not fetch next task if the queue has not been started.
-                if (!_isStarted)
+                if (!context.IsStarted)
                 {
                     return;
                 }
@@ -49,25 +31,25 @@ namespace Sundstrom.Tasks.Scheduling
 
                     // Peek the current task.
 
-                    _current = context.Queue.Peek();
+                    context._current = context.Queue.Peek();
 
                     try
                     {
-                        _isRunning = true;
-                        _isBusy = true;
+                        context.IsRunning = true;
+                        context.IsBusy = true;
 
                         // Execute the current task.
 
-                        context.RaiseTaskExecuting(new TaskEventArgs(_current));
+                        context.RaiseTaskExecuting(new TaskEventArgs(context._current));
 
-                        await _current.Action(_current, context.CancellationToken);
+                        await context._current.Action(context._current, context.CancellationToken);
                     }
                     catch (Exception exc)
                     {
                         // Handle any exception thrown inside a task.
                         // Invoke the Exception event handlers.
 
-                        var eventArgs = new TaskExceptionEventArgs(_current, exc, context.CancelOnException);
+                        var eventArgs = new TaskExceptionEventArgs(context._current, exc, context.CancelOnException);
 
                         context.RaiseTaskException(eventArgs);
 
@@ -79,9 +61,9 @@ namespace Sundstrom.Tasks.Scheduling
                         }
                     }
 
-                    context.RaiseTaskExecuted(new TaskEventArgs(_current));
+                    context.RaiseTaskExecuted(new TaskEventArgs(context._current));
 
-                    _current = null;
+                    context._current = null;
 
                     // Dequeue the currently finished task and request the next.
 
@@ -89,7 +71,7 @@ namespace Sundstrom.Tasks.Scheduling
                     {
                         context.Queue.Dequeue();
                     }
-                    _isBusy = false;
+                    context.IsBusy = false;
                     await Next(context);
                 }
                 else
@@ -99,7 +81,7 @@ namespace Sundstrom.Tasks.Scheduling
             }
             else
             {
-                _isRunning = false;
+                context.IsRunning = false;
             }
         }
 
@@ -113,17 +95,17 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override void Stop(SchedulerContext<TaskInfo> context)
         {
-            if (!_isStarted)
+            if (!context.IsStarted)
             {
                 throw new InvalidCastException("Queue has not been started.");
             }
 
             context.CancellationTokenSource.Cancel();
 
-            _isStarted = false;
-            _isStopped = true;
-            _isRunning = false;
-            _isBusy = false;
+            context.IsStarted = false;
+            context.IsStopped = true;
+            context.IsRunning = false;
+            context.IsBusy = false;
 
             context.RaiseQueueStopped(new QueueEventArgs());
         }
@@ -149,7 +131,7 @@ namespace Sundstrom.Tasks.Scheduling
 
         public override void Clear(SchedulerContext<TaskInfo> context)
         {
-            if (_isBusy) throw new InvalidOperationException();
+            if (context.IsBusy) throw new InvalidOperationException();
 
             while (context.Queue.Count > 0)
             {
@@ -160,42 +142,42 @@ namespace Sundstrom.Tasks.Scheduling
 
         private void ClearCore(SchedulerContext<TaskInfo> context)
         {
-            _isBusy = false;
+            context.IsBusy = false;
             Clear(context);
         }
 
         public override void Start(SchedulerContext<TaskInfo> context)
         {
-            if (_isStarted)
+            if (context.IsStarted)
             {
                 throw new InvalidCastException("Queue has already been started.");
             }
-            _isStarted = true;
-            _isStopped = false;
+            context.IsStarted = true;
+            context.IsStopped = false;
 
             Next(context);
 
             context.RaiseQueueStarted(new QueueEventArgs());
         }
 
-        public override SchedulerContext<TaskInfo> GetContext(TaskQueue taskQueue, ITaskCollection<TaskInfo> items, CancellationTokenSource cts, QueueData queueData)
+        public override SchedulerContext<TaskInfo> GetContext(TaskQueue taskQueue, ITaskCollection<TaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData)
         {
             return new SchedulerContext<TaskInfo>(items, cts)
             {
                 Delay = taskQueue.Delay,
                 CancelOnException = taskQueue.CancelOnException,
 
-                _queueEmpty = queueData.RaiseQueueEmpty,
+                _queueEmpty = queueData._queueEmpty,
 
-                _queueStarted = queueData.RaiseQueueStarted,
-                _queueStopped = queueData.RaiseQueueStopped,
+                _queueStarted = queueData._queueStarted,
+                _queueStopped = queueData._queueStopped,
 
-                _taskScheduled = queueData.RaiseTaskScheduled,
-                _taskCanceled = queueData.RaiseTaskCanceled,
-                _taskCanceling = queueData.RaiseTaskCanceling,
-                _taskExecuting = queueData.RaiseTaskExecuting,
-                _taskExecuted = queueData.RaiseTaskExecuted,
-                _taskException = queueData.RaiseTaskException,
+                _taskScheduled = queueData._taskScheduled,
+                _taskCanceled = queueData._taskCanceled,
+                _taskCanceling = queueData._taskCanceling,
+                _taskExecuting = queueData._taskExecuting,
+                _taskExecuted = queueData._taskExecuted,
+                _taskException = queueData._taskException
             };
         }
 

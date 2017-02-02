@@ -101,6 +101,7 @@ namespace Sundstrom.Tasks
             EnsureSchedulerContextIsSet();
 
             Scheduler.Start(_schedulerContext);
+
             return this;
         }
 
@@ -160,7 +161,7 @@ namespace Sundstrom.Tasks
             get => _delay;
             set
             {
-                if (Scheduler.IsStarted)
+                if (_schedulerContext != null && _schedulerContext.IsStarted)
                 {
                     throw new InvalidOperationException("Can not be set when the queue is running.");
                 }
@@ -176,7 +177,7 @@ namespace Sundstrom.Tasks
             get => _cancelOnException;
             set
             {
-                if (Scheduler.IsStarted)
+                if (_schedulerContext != null && _schedulerContext.IsStarted)
                 {
                     throw new InvalidOperationException("Can not be set when the queue is running.");
                 }
@@ -232,17 +233,17 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Gets a value that indicates whether this queue is started or not.
         /// </summary>
-        public bool IsStarted => Scheduler.IsStarted;
+        public bool IsStarted => _schedulerContext.IsStarted;
 
         /// <summary>
         /// Gets a value that indicates whether this queue has been stopped or not.
         /// </summary>
-        public bool IsStopped => Scheduler.IsStopped;
+        public bool IsStopped => _schedulerContext.IsStopped;
 
         /// <summary>
         /// Gets a value that indicates whether this queue is running or not.
         /// </summary>
-        public bool IsRunning => Scheduler.IsRunning;
+        public bool IsRunning => _schedulerContext.IsRunning;
 
         /// <summary>
         /// Gets the number of tasks currently in the queue.
@@ -349,7 +350,7 @@ namespace Sundstrom.Tasks
                 collection = Scheduler.CreateCollection();
             }
 
-            var queueData = new QueueData()
+            var queueData = new SchedulerContextData()
             {
                 _queueEmpty = RaiseQueueEmpty,
 

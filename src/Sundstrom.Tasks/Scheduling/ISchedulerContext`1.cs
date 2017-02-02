@@ -9,6 +9,8 @@ namespace Sundstrom.Tasks.Scheduling
         
         where TTaskInfo : TaskInfo
     {
+        new TTaskInfo Current { get; }
+
         new ITaskCollection<TTaskInfo> Queue { get; }
         void Remove(TTaskInfo task);
     }

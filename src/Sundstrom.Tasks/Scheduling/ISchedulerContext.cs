@@ -9,7 +9,12 @@ namespace Sundstrom.Tasks.Scheduling
         CancellationToken CancellationToken { get; }
         bool CancelOnException { get; }
         TimeSpan Delay { get; }
+
         ITaskCollection Queue { get; }
+        TaskInfo Current { get; }
+        bool IsRunning { get; }
+        bool IsStarted { get; }
+        bool IsStopped { get; }
 
         void RaiseQueueEmpty(QueueEventArgs e);
         void RaiseQueueStarted(QueueEventArgs e);

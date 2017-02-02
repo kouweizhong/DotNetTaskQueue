@@ -15,6 +15,6 @@ namespace Sundstrom.Tasks.Scheduling
         //    where TTaskInfo : TaskInfo
         //    => (TSchedulerContext)source._schedulerContext;
 
-        public static TaskInfo GetCurrentTask(this TaskQueue source) => source.Scheduler.Current;
+        public static TaskInfo GetCurrentTask(this TaskQueue source) => source._schedulerContext.Current;
     }
 }

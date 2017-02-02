@@ -2,7 +2,7 @@
 
 namespace Sundstrom.Tasks.Scheduling
 {
-    public sealed class QueueData
+    public sealed class SchedulerContextData
     {
         internal Action<QueueEventArgs> _queueEmpty;
         internal Action<QueueEventArgs> _queueStarted;

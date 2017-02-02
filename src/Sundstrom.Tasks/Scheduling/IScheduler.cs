@@ -6,11 +6,6 @@ namespace Sundstrom.Tasks.Scheduling
 {
     public interface IScheduler
     {
-        TaskInfo Current { get; }
-        bool IsRunning { get; }
-        bool IsStarted { get; }
-        bool IsStopped { get; }
-
         void Clear(ISchedulerContext context);
         void Deschedule(ISchedulerContext context, TaskInfo task);
         Task Next(ISchedulerContext context);
@@ -18,7 +13,7 @@ namespace Sundstrom.Tasks.Scheduling
         void Start(ISchedulerContext context);
         void Stop(ISchedulerContext context);
 
-        ISchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, QueueData queueData);
+        ISchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, SchedulerContextData queueData);
         ITaskCollection CreateCollection();
     }
 }

@@ -8,8 +8,6 @@ namespace Sundstrom.Tasks.Scheduling
         where TTaskInfo : TaskInfo
         where TSchedulerContext : ISchedulerContext<TTaskInfo>
     {
-        new TTaskInfo Current { get; }
-
         void Deschedule(TSchedulerContext context, TTaskInfo task);
         void Schedule(TSchedulerContext context, TTaskInfo task);
         void Clear(TSchedulerContext context);
@@ -17,7 +15,7 @@ namespace Sundstrom.Tasks.Scheduling
         void Start(TSchedulerContext context);
         void Stop(TSchedulerContext context);
 
-        TSchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, QueueData queueData);
+        TSchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData);
         new ITaskCollection<TTaskInfo> CreateCollection();
     }
 }

@@ -10,6 +10,8 @@ namespace Sundstrom.Tasks.Scheduling
     {
         private CancellationTokenSource cts = new CancellationTokenSource();
 
+        internal TTaskInfo _current;
+
         internal Action<QueueEventArgs> _queueEmpty;
         internal Action<QueueEventArgs> _queueStarted;
         internal Action<QueueEventArgs> _queueStopped;
@@ -44,6 +46,18 @@ namespace Sundstrom.Tasks.Scheduling
         public bool IsInvalid { get; private set; }
 
         public void Invalidate() => IsInvalid = true;
+
+        public bool IsStarted { get; internal set; }
+
+        public bool IsRunning { get; internal set; }
+
+        public bool IsStopped { get; internal set; }
+
+        public TTaskInfo Current => _current;
+
+        TaskInfo ISchedulerContext.Current => _current;
+
+        internal bool IsBusy { get; set; }
 
         public void Remove(TTaskInfo task) => Queue.Remove(task);
 

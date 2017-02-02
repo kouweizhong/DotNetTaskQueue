@@ -52,9 +52,9 @@ namespace Sundstrom.Tasks.Scheduling
             Schedule((TSchedulerContext)context, (TTaskInfo)task);
         }
 
-        public abstract TSchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, QueueData queueData);
+        public abstract TSchedulerContext GetContext(TaskQueue taskQueue, ITaskCollection<TTaskInfo> items, CancellationTokenSource cts, SchedulerContextData queueData);
 
-        ISchedulerContext IScheduler.GetContext(TaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, QueueData queueData)
+        ISchedulerContext IScheduler.GetContext(TaskQueue taskQueue, ITaskCollection items, CancellationTokenSource cts, SchedulerContextData queueData)
         {
             return GetContext(taskQueue, (ITaskCollection<TTaskInfo>)items, cts, queueData);
         }
@@ -65,15 +65,5 @@ namespace Sundstrom.Tasks.Scheduling
         {
             return CreateCollection();
         }
-
-        public abstract bool IsStarted { get; }
-
-        public abstract bool IsRunning { get; }
-
-        public abstract bool IsStopped { get; }
-
-        public abstract TTaskInfo Current { get; }
-
-        TaskInfo IScheduler.Current => Current;
     }
 }
