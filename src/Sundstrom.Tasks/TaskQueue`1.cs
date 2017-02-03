@@ -95,7 +95,7 @@ namespace Sundstrom.Tasks
         /// Starts the queue.
         /// </summary>
         /// <returns>The start.</returns>
-        public TaskQueue<TTaskInfo> Start()
+        public ITaskQueue<TTaskInfo> Start()
         {
             EnsureSchedulerContextIsSet();
 
@@ -125,7 +125,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Stops the queue.
         /// </summary>
-        public TaskQueue<TTaskInfo> Stop()
+        public ITaskQueue<TTaskInfo> Stop()
         {
             _schedulerContext.Invalidate();
 
@@ -148,7 +148,7 @@ namespace Sundstrom.Tasks
         /// <summary>
         /// Clear the queue and cancel all unexecuted tasks.
         /// </summary>
-        public TaskQueue<TTaskInfo> Clear()
+        public ITaskQueue<TTaskInfo> Clear()
         {
             Scheduler.Clear(_schedulerContext);
 
