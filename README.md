@@ -6,7 +6,7 @@ Simple task queue for .NET Standard.
 TaskQueue for x-plat .NET that supports queueing and chaining of sequential tasks - both synchronous and asynchronous code.
 
 ```csharp
-await TaskQueue.Default.Schedule(async (context, ct) =>
+await TaskQueueFactory.Default.Schedule(async (context, ct) =>
 {
     Console.WriteLine("Item 1: Async");
 
@@ -29,14 +29,16 @@ Handle exceptions:
 
 ```csharp
 // Cancels the rest of the tasks in queue on exception (optional)
-TaskQueue.Default.CancelOnException = true;
+var queue = TaskQueueFactory.Default;
 
-TaskQueue.Default.TaskException += (sender, args) =>
+queue.CancelOnException = true;
+
+queue.TaskException += (sender, args) =>
 {
     Console.WriteLine(args.Exception);
 };
 
-TaskQueue.Default.Start();
+queue.Start();
 ```
 
 Also supports:
